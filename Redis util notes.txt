@@ -54,3 +54,15 @@ public long getSumOfAllErrorCountsUsingStreams(String redisKey) {
         })
         .sum();  // Sum all the filtered and converted error counts
 }
+
+SELECT 
+    categoryCode,
+    COUNT(*) AS count,
+    CASE 
+        WHEN categoryCode = 'A' THEN 'Active'
+        WHEN categoryCode = 'C' THEN 'Closed'
+        ELSE 'Unknown'  -- Optional: handle other cases
+    END AS categoryCodeDescription
+FROM your_table
+GROUP BY 
+    categoryCode;
