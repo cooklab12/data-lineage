@@ -1,0 +1,56 @@
+Redis util notes
+
+@Autowired
+private RedisTemplate<String, Object> redisTemplate;
+
+public long getSumOfAllErrorCounts(String redisKey) {
+    // Retrieve all hash entries for the given key
+    Map<Object, Object> entries = redisTemplate.opsForHash().entries(redisKey);
+
+    long totalErrorCount = 0;
+
+    // Iterate through all fields and sum up the error counts
+    for (Map.Entry<Object, Object> entry : entries.entrySet()) {
+        String field = (String) entry.getKey();
+
+        // Check if the field is related to errorCount
+        if (field.endsWith(":errorCount")) {
+            String errorCountStr = (String) entry.getValue(); // Assuming it's stored as a string
+            try {
+                // Convert the string to long and sum it up
+                long errorCount = Long.parseLong(errorCountStr);
+                totalErrorCount += errorCount;
+            } catch (NumberFormatException e) {
+                // Handle invalid number format, if necessary
+                System.out.println("Invalid error count value for field: " + field);
+            }
+        }
+    }
+
+    return totalErrorCount;
+}
+
+
+--Using streams
+
+@Autowired
+private RedisTemplate<String, Object> redisTemplate;
+
+public long getSumOfAllErrorCountsUsingStreams(String redisKey) {
+    // Retrieve all hash entries for the given key
+    Map<Object, Object> entries = redisTemplate.opsForHash().entries(redisKey);
+
+    // Use streams to filter, map to long, and sum the error counts
+    return entries.entrySet().stream()
+        .filter(entry -> ((String) entry.getKey()).endsWith(":errorCount"))  // Filter fields ending with ":errorCount"
+        .mapToLong(entry -> {
+            String errorCountStr = (String) entry.getValue(); // Assuming value is stored as String
+            try {
+                return Long.parseLong(errorCountStr);  // Convert the string to long
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid error count value: " + errorCountStr);
+                return 0L;  // Return 0 if there's an invalid format
+            }
+        })
+        .sum();  // Sum all the filtered and converted error counts
+}
