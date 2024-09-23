@@ -66,3 +66,21 @@ SELECT
 FROM your_table
 GROUP BY 
     categoryCode;
+
+
+SELECT
+    SUM(CASE 
+            WHEN TRUNC(SYSDATE) - previous_success_date BETWEEN 0 AND 5 THEN 1 
+            ELSE 0 
+        END) AS "0-5_days",
+    SUM(CASE 
+            WHEN TRUNC(SYSDATE) - previous_success_date BETWEEN 6 AND 10 THEN 1 
+            ELSE 0 
+        END) AS "6-10_days",
+    SUM(CASE 
+            WHEN TRUNC(SYSDATE) - previous_success_date > 10 THEN 1 
+            ELSE 0 
+        END) AS "10+_days"
+FROM 
+    (SELECT DISTINCT acctkey, previous_success_date 
+     FROM status);
