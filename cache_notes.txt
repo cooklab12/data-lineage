@@ -1,0 +1,69 @@
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPOutputStream;
+
+@RestController
+public class JsonCachingController {
+
+    private static final String CACHE_KEY = "largeJson";
+    private final Cache<String, byte[]> cache;
+
+    public JsonCachingController() {
+        this.cache = Caffeine.newBuilder()
+                .expireAfterWrite(1, TimeUnit.HOURS)  // Cache entries expire after 1 hour
+                .maximumSize(1)  // Only one entry in the cache
+                .build();
+    }
+
+    @PostConstruct
+    public void init() throws IOException {
+        // Load and compress the JSON file on application startup
+        ClassPathResource resource = new ClassPathResource("large-file.json");
+        try (InputStream inputStream = resource.getInputStream();
+             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+             GZIPOutputStream gzipStream = new GZIPOutputStream(byteStream)) {
+
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inputStream.read(buffer)) > 0) {
+                gzipStream.write(buffer, 0, len);
+            }
+            gzipStream.finish();
+            
+            byte[] compressedJson = byteStream.toByteArray();
+            
+            // Store the compressed JSON in Caffeine cache
+            cache.put(CACHE_KEY, compressedJson);
+        }
+    }
+
+    @GetMapping("/api/large-json")
+    public ResponseEntity<byte[]> getLargeJson() {
+        byte[] compressedJson = cache.getIfPresent(CACHE_KEY);
+        
+        if (compressedJson == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.CONTENT_ENCODING, "gzip");
+        headers.setContentLength(compressedJson.length);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(compressedJson);
+    }
+}
