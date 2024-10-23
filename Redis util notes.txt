@@ -88,24 +88,11 @@ FROM
 
 SELECT 
     proc_inst_id_,
-    MAX(CASE WHEN NAME_ = 'variable1' THEN 
-        CASE 
-            WHEN TYPE_ = 'string' THEN TEXT_
-            WHEN TYPE_ = 'integer' THEN CAST(LONG_ AS VARCHAR)
-            WHEN TYPE_ = 'double' THEN CAST(DOUBLE_ AS VARCHAR)
-            WHEN TYPE_ = 'boolean' THEN CAST(BINARY_ AS VARCHAR)
-            ELSE TEXT_
-        END 
-    END) as variable1,
-    MAX(CASE WHEN NAME_ = 'variable2' THEN 
-        CASE 
-            WHEN TYPE_ = 'string' THEN TEXT_
-            WHEN TYPE_ = 'integer' THEN CAST(LONG_ AS VARCHAR)
-            WHEN TYPE_ = 'double' THEN CAST(DOUBLE_ AS VARCHAR)
-            WHEN TYPE_ = 'boolean' THEN CAST(BINARY_ AS VARCHAR)
-            ELSE TEXT_
-        END
-    END) as variable2
+    MAX(CASE WHEN NAME_ = 'applicationName' THEN TEXT_ END) as applicationName,
+    MAX(CASE WHEN NAME_ = 'customerId' THEN TEXT_ END) as customerId,
+    MAX(CASE WHEN NAME_ = 'status' THEN TEXT_ END) as status
+    -- Add more variables as needed following the same pattern:
+    -- MAX(CASE WHEN NAME_ = 'yourVariableName' THEN TEXT_ END) as yourVariableName
 FROM ACT_RU_VARIABLE
 GROUP BY proc_inst_id_
-ORDER BY proc_inst_id_;
+ORDER BY proc_inst_id_;;
