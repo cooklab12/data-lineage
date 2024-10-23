@@ -96,3 +96,31 @@ SELECT
 FROM ACT_RU_VARIABLE
 GROUP BY proc_inst_id_
 ORDER BY proc_inst_id_;;
+
+
+-- Option 1: Convert BLOB to VARCHAR (if content is text-based)
+SELECT 
+    ID_,
+    NAME_,
+    CAST(BYTES_ AS VARCHAR(MAX)) as CONTENT_TEXT
+FROM ACT_GE_BYTEARRAY
+WHERE ID_ = 'your_byte_array_id';
+
+-- Option 2: Convert BLOB to Base64 string (if binary content)
+SELECT 
+    ID_,
+    NAME_,
+    CAST('' AS XML).value('xs:base64Binary(xs:hexBinary(sql:column("BYTES_")))', 'VARCHAR(MAX)') as CONTENT_BASE64
+FROM ACT_GE_BYTEARRAY
+WHERE ID_ = 'your_byte_array_id';
+
+-- Option 3: View all metadata and first part of content
+SELECT 
+    ID_,
+    NAME_,
+    DEPLOYMENT_ID_,
+    BYTES_ as RAW_CONTENT,
+    CAST(SUBSTRING(CAST(BYTES_ AS VARCHAR(MAX)), 1, 1000) as VARCHAR(1000)) as PREVIEW_CONTENT,
+    DATALENGTH(BYTES_) as CONTENT_LENGTH
+FROM ACT_GE_BYTEARRAY
+ORDER BY ID_;
