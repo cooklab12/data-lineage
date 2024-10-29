@@ -288,3 +288,22 @@ public class ByteArrayUploader {
         System.out.println("Response body: " + response.getBody());
     }
 }
+
+
+
+
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.headers._
+import akka.http.scaladsl.model._
+import akka.util.ByteString
+
+import scala.concurrent.Future
+
+val route =
+  path("gzip-example") {
+    get {
+      encodeResponseWith(HttpEncodings.gzip) {
+        complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, "This is a gzip-compressed response."))
+      }
+    }
+  }
