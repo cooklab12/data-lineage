@@ -307,3 +307,61 @@ val route =
       }
     }
   }
+
+
+
+
+
+
+
+
+
+
+  import akka.http.scaladsl.model._
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.headers._
+import akka.util.ByteString
+import java.io.ByteArrayOutputStream
+import java.util.zip.GZIPOutputStream
+
+trait GzipService {
+  def gzipResponse(content: String): HttpResponse = {
+    // Compress the content
+    val baos = new ByteArrayOutputStream()
+    val gzipStream = new GZIPOutputStream(baos)
+    gzipStream.write(content.getBytes("UTF-8"))
+    gzipStream.close()
+    
+    val compressedData = ByteString(baos.toByteArray)
+    
+    // Create response with required headers
+    HttpResponse(
+      status = StatusCodes.OK,
+      entity = HttpEntity(
+        contentType = ContentTypes.`application/json`,
+        compressedData
+      ),
+      headers = List(
+        `Content-Encoding`(HttpEncodings.gzip),
+        `Content-Length`(compressedData.length)
+      )
+    )
+  }
+
+  // Example route using the gzip response
+  val route = {
+    path("compressed-data") {
+      get {
+        complete {
+          val jsonData = """{"message": "This is compressed data"}"""
+          gzipResponse(jsonData)
+        }
+      }
+    }
+  }
+}
+
+// Usage example
+object MyService extends GzipService {
+  // Your other service code here
+}
