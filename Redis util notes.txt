@@ -222,3 +222,18 @@ public class JsonFileToListExample {
     <artifactId>jackson-databind</artifactId>
     <version>2.15.2</version>
 </dependency>
+
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        byte[] fileContent = "Sample file content".getBytes(); // Replace with your actual byte array
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://your-api-endpoint.com/upload"))  // Replace with your URL
+            .header("Content-Type", "application/octet-stream")
+            .POST(BodyPublishers.ofByteArray(fileContent))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Response status code: " + response.statusCode());
+        System.out.println("Response body: " + response.body());
