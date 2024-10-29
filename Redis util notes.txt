@@ -195,3 +195,22 @@ public class JsonToListExample {
         }
     }
 }
+
+
+public class JsonFileToListExample {
+    public static void main(String[] args) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Path to your JSON file
+            File file = new File("data.json");
+
+            // Read JSON file and convert to list of MyObject
+            List<MyObject> myObjectList = mapper.readValue(file, new TypeReference<List<MyObject>>() {});
+            
+            // Print each object to verify
+            myObjectList.forEach(obj -> System.out.println(obj.getField1() + ", " + obj.getField2()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
