@@ -237,3 +237,54 @@ public class JsonFileToListExample {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("Response status code: " + response.statusCode());
         System.out.println("Response body: " + response.body());
+
+
+
+
+
+
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+public class ByteArrayUploader {
+    public static void main(String[] args) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://your-api-endpoint.com/upload";  // Replace with your URL
+
+        // Byte array representing the file content
+        byte[] fileContent = "Sample file content".getBytes(); // Replace with your actual byte array
+
+        // Create headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        // Create the ByteArrayResource for the file
+        ByteArrayResource byteArrayResource = new ByteArrayResource(fileContent) {
+            @Override
+            public String getFilename() {
+                return "filename.txt";  // This sets the filename in the request
+            }
+        };
+
+        // Add the byte array as a file in the body
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", byteArrayResource);
+
+        // Create HttpEntity with headers and body
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // Send the POST request
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+        // Print response
+        System.out.println("Response status code: " + response.getStatusCodeValue());
+        System.out.println("Response body: " + response.getBody());
+    }
+}
