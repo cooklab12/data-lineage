@@ -172,3 +172,26 @@ public class CSVtoJSON {
         System.out.println(jsonArray.toString());
     }
 }
+
+
+
+
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
+
+public class JsonToListExample {
+    public static void main(String[] args) {
+        String jsonArray = "[{\"field1\":\"value1\", \"field2\":123}, {\"field1\":\"value2\", \"field2\":456}]";
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            List<MyObject> myObjectList = mapper.readValue(jsonArray, new TypeReference<List<MyObject>>() {});
+            myObjectList.forEach(obj -> System.out.println(obj.getField1() + ", " + obj.getField2()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
