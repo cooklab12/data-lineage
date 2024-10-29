@@ -131,3 +131,44 @@ SELECT ID_, NAME_, UTL_RAW.CAST_TO_VARCHAR2(DBMS_LOB.SUBSTR(BYTES_, 4000, 1)) AS
 FROM ACT_GE_BYTEARRAY
 WHERE NAME_ = 'your_filename_here'
 AND LENGTH(BYTES_) <= 4000; -- Adjust this based on your needs
+
+
+<dependency>
+    <groupId>com.opencsv</groupId>
+    <artifactId>opencsv</artifactId>
+    <version>5.5.2</version>
+</dependency>
+<dependency>
+    <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20210307</version>
+</dependency>
+
+
+import com.opencsv.CSVReader;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileReader;
+import java.io.IOException;
+
+public class CSVtoJSON {
+    public static void main(String[] args) throws IOException {
+        String csvFilePath = "your_file.csv";
+        JSONArray jsonArray = new JSONArray();
+
+        try (CSVReader reader = new CSVReader(new FileReader(csvFilePath))) {
+            String[] headers = reader.readNext(); // First row as headers
+            String[] row;
+            while ((row = reader.readNext()) != null) {
+                JSONObject jsonObject = new JSONObject();
+                for (int i = 0; i < headers.length; i++) {
+                    jsonObject.put(headers[i], row[i]);
+                }
+                jsonArray.put(jsonObject);
+            }
+        }
+
+        System.out.println(jsonArray.toString());
+    }
+}
