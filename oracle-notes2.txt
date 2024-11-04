@@ -1,0 +1,195 @@
+// First, add these dependencies to your pom.xml:
+/*
+<dependencies>
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20231013</version>
+    </dependency>
+    <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>21.9.0.0</version>
+    </dependency>
+</dependencies>
+*/
+
+// JsonToDatabase.java
+import org.json.JSONObject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class JsonToDatabase {
+    private static final String DB_URL = "jdbc:oracle:thin:@//localhost:1521/YOUR_SERVICE";
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
+    private static final int BATCH_SIZE = 1000; // Adjust based on your needs
+
+    public static void main(String[] args) {
+        createTable();
+        
+        try {
+            // Read JSON file
+            String content = new String(Files.readAllBytes(Paths.get("input.json")));
+            JSONObject jsonObject = new JSONObject(content);
+
+            // Bulk insert data
+            long startTime = System.currentTimeMillis();
+            bulkInsertData(jsonObject);
+            long endTime = System.currentTimeMillis();
+            
+            System.out.println("Data successfully inserted into database. Time taken: " + 
+                             (endTime - startTime) + " ms");
+            
+        } catch (IOException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createTable() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            // Drop existing indexes if any
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("BEGIN " +
+                           "  EXECUTE IMMEDIATE 'DROP INDEX IDX_JSON_STORE_KEY'; " +
+                           "EXCEPTION " +
+                           "  WHEN OTHERS THEN NULL; " +
+                           "END;");
+            } catch (SQLException e) {
+                // Ignore if index doesn't exist
+            }
+            
+            // Create table with CLOB for better performance with large JSON
+            try (Statement stmt = conn.createStatement()) {
+                stmt.execute("CREATE TABLE IF NOT EXISTS JSON_STORE (" +
+                           "KEY_COL VARCHAR2(100), " +
+                           "VALUE_COL CLOB)");
+                
+                // Create index after bulk load
+                stmt.execute("CREATE INDEX IDX_JSON_STORE_KEY ON JSON_STORE(KEY_COL)");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void bulkInsertData(JSONObject jsonObject) throws SQLException {
+        String sql = "INSERT INTO JSON_STORE (KEY_COL, VALUE_COL) VALUES (?, ?)";
+        List<String> keys = new ArrayList<>(jsonObject.keySet());
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            // Disable auto-commit for better performance
+            conn.setAutoCommit(false);
+            
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                int count = 0;
+                
+                for (String key : keys) {
+                    Object value = jsonObject.get(key);
+                    pstmt.setString(1, key);
+                    pstmt.setString(2, value.toString());
+                    pstmt.addBatch();
+                    count++;
+                    
+                    if (count % BATCH_SIZE == 0) {
+                        pstmt.executeBatch();
+                        conn.commit();
+                        System.out.println("Processed " + count + " records");
+                    }
+                }
+                
+                // Insert remaining records
+                if (count % BATCH_SIZE != 0) {
+                    pstmt.executeBatch();
+                    conn.commit();
+                }
+            }
+        }
+    }
+}
+
+// DatabaseToJson.java
+import org.json.JSONObject;
+import java.sql.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import oracle.jdbc.OracleConnection;
+import java.util.Properties;
+
+public class DatabaseToJson {
+    private static final String DB_URL = "jdbc:oracle:thin:@//localhost:1521/YOUR_SERVICE";
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
+    private static final int FETCH_SIZE = 1000; // Adjust based on your needs
+
+    public static void main(String[] args) {
+        try {
+            long startTime = System.currentTimeMillis();
+            
+            // Read from database and create JSON
+            JSONObject resultJson = bulkReadFromDatabase();
+            
+            // Write to output file
+            writeJsonToFile(resultJson, "output.json");
+            
+            long endTime = System.currentTimeMillis();
+            System.out.println("JSON successfully reconstructed from database. Time taken: " + 
+                             (endTime - startTime) + " ms");
+            
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static JSONObject bulkReadFromDatabase() throws SQLException {
+        JSONObject resultJson = new JSONObject();
+        String sql = "SELECT KEY_COL, VALUE_COL FROM JSON_STORE";
+        
+        Properties props = new Properties();
+        props.setProperty("user", USER);
+        props.setProperty("password", PASS);
+        props.setProperty("defaultRowPrefetch", String.valueOf(FETCH_SIZE));
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, props)) {
+            if (conn.isWrapperFor(OracleConnection.class)) {
+                OracleConnection oracleConn = conn.unwrap(OracleConnection.class);
+                oracleConn.setDefaultRowPrefetch(FETCH_SIZE);
+            }
+            
+            try (Statement stmt = conn.createStatement()) {
+                stmt.setFetchSize(FETCH_SIZE);
+                
+                try (ResultSet rs = stmt.executeQuery(sql)) {
+                    int count = 0;
+                    while (rs.next()) {
+                        String key = rs.getString("KEY_COL");
+                        String valueStr = rs.getString("VALUE_COL");
+                        
+                        try {
+                            JSONObject valueJson = new JSONObject(valueStr);
+                            resultJson.put(key, valueJson);
+                        } catch (Exception e) {
+                            resultJson.put(key, valueStr);
+                        }
+                        
+                        count++;
+                        if (count % FETCH_SIZE == 0) {
+                            System.out.println("Processed " + count + " records");
+                        }
+                    }
+                }
+            }
+        }
+        return resultJson;
+    }
+
+    private static void writeJsonToFile(JSONObject json, String filename) throws IOException {
+        try (FileWriter file = new FileWriter(filename)) {
+            file.write(json.toString(2));
+        }
+    }
+}
