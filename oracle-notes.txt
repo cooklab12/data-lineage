@@ -58,3 +58,50 @@ String value = clob.getSubString(1, (int) clob.length());
     <artifactId>ojdbc8</artifactId>
     <version>19.8.0.0</version> <!-- Replace with the desired version -->
 </dependency>
+
+
+
+Insert
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonToDatabase {
+    public static void main(String[] args) {
+        // Path to your JSON file
+        String jsonFilePath = "path/to/your/file.json";
+        String url = "jdbc:oracle:thin:@your_db_url";
+        String username = "your_username";
+        String password = "your_password";
+
+        // SQL insert statement
+        String sql = "INSERT INTO my_table (key_column, value_column) VALUES (?, ?)";
+
+        // Create ObjectMapper instance
+        ObjectMapper mapper = new ObjectMapper();
+
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            // Read JSON file into a Map
+            Map<String, String> dataMap = mapper.readValue(new File(jsonFilePath), Map.class);
+
+            // Iterate over the map and insert data into the database
+            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+                stmt.setString(1, entry.getKey());
+                stmt.setString(2, entry.getValue()); // Assuming value is a string representation of JSON
+                stmt.addBatch(); // Add to batch for batch processing
+            }
+
+            // Execute batch insert
+            int[] insertCounts = stmt.executeBatch();
+            System.out.println("Inserted rows: " + insertCounts.length);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
