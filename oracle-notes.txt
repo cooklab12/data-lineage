@@ -1,0 +1,60 @@
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.3</version> <!-- Replace with the latest version -->
+</dependency>
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class FetchAndConsolidateJson {
+    public static void main(String[] args) {
+        String url = "jdbc:oracle:thin:@your_db_url";
+        String username = "your_username";
+        String password = "your_password";
+        String sql = "SELECT key_column, value_column FROM my_table";
+
+        // ObjectMapper for converting Java Map to JSON string
+        ObjectMapper mapper = new ObjectMapper();
+
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            // Map to hold key-value pairs
+            Map<String, String> resultMap = new HashMap<>();
+
+            while (rs.next()) {
+                String key = rs.getString("key_column");
+                String value = rs.getString("value_column");  // Assuming `CLOB` data is retrieved as String
+
+                resultMap.put(key, value);
+            }
+
+            // Convert the resultMap to JSON
+            String consolidatedJson = mapper.writeValueAsString(resultMap);
+            System.out.println("Consolidated JSON: " + consolidatedJson);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
+java.sql.Clob clob = rs.getClob("value_column");
+String value = clob.getSubString(1, (int) clob.length());
+
+
+<dependency>
+    <groupId>com.oracle.database.jdbc</groupId>
+    <artifactId>ojdbc8</artifactId>
+    <version>19.8.0.0</version> <!-- Replace with the desired version -->
+</dependency>
