@@ -1,107 +1,135 @@
-<dependency>
-    <groupId>com.fasterxml.jackson.core</groupId>
-    <artifactId>jackson-databind</artifactId>
-    <version>2.13.3</version> <!-- Replace with the latest version -->
-</dependency>
+// First, add these dependencies to your pom.xml:
+/*
+<dependencies>
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20231013</version>
+    </dependency>
+    <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc8</artifactId>
+        <version>21.9.0.0</version>
+    </dependency>
+</dependencies>
+*/
 
+// JsonToDatabase.java
+import org.json.JSONObject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
+public class JsonToDatabase {
+    // Database connection details
+    private static final String DB_URL = "jdbc:oracle:thin:@//localhost:1521/YOUR_SERVICE";
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
 
-public class FetchAndConsolidateJson {
     public static void main(String[] args) {
-        String url = "jdbc:oracle:thin:@your_db_url";
-        String username = "your_username";
-        String password = "your_password";
-        String sql = "SELECT key_column, value_column FROM my_table";
+        // Create table if it doesn't exist
+        createTable();
+        
+        try {
+            // Read JSON file
+            String content = new String(Files.readAllBytes(Paths.get("input.json")));
+            JSONObject jsonObject = new JSONObject(content);
 
-        // ObjectMapper for converting Java Map to JSON string
-        ObjectMapper mapper = new ObjectMapper();
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            // Map to hold key-value pairs
-            Map<String, String> resultMap = new HashMap<>();
-
-            while (rs.next()) {
-                String key = rs.getString("key_column");
-                String value = rs.getString("value_column");  // Assuming `CLOB` data is retrieved as String
-
-                resultMap.put(key, value);
-            }
-
-            // Convert the resultMap to JSON
-            String consolidatedJson = mapper.writeValueAsString(resultMap);
-            System.out.println("Consolidated JSON: " + consolidatedJson);
-
-        } catch (Exception e) {
+            // Insert data into database
+            insertData(jsonObject);
+            
+            System.out.println("Data successfully inserted into database.");
+            
+        } catch (IOException | SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void createTable() {
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement()) {
+            
+            String sql = "CREATE TABLE IF NOT EXISTS JSON_STORE (" +
+                        "KEY_COL VARCHAR2(100) PRIMARY KEY, " +
+                        "VALUE_COL CLOB)";
+            stmt.execute(sql);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void insertData(JSONObject jsonObject) throws SQLException {
+        String sql = "INSERT INTO JSON_STORE (KEY_COL, VALUE_COL) VALUES (?, ?)";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            for (String key : jsonObject.keySet()) {
+                Object value = jsonObject.get(key);
+                pstmt.setString(1, key);
+                pstmt.setString(2, value.toString());
+                pstmt.executeUpdate();
+            }
         }
     }
 }
 
+// DatabaseToJson.java
+import org.json.JSONObject;
+import java.sql.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
+public class DatabaseToJson {
+    // Database connection details (same as above)
+    private static final String DB_URL = "jdbc:oracle:thin:@//localhost:1521/YOUR_SERVICE";
+    private static final String USER = "your_username";
+    private static final String PASS = "your_password";
 
-java.sql.Clob clob = rs.getClob("value_column");
-String value = clob.getSubString(1, (int) clob.length());
-
-
-<dependency>
-    <groupId>com.oracle.database.jdbc</groupId>
-    <artifactId>ojdbc8</artifactId>
-    <version>19.8.0.0</version> <!-- Replace with the desired version -->
-</dependency>
-
-
-
-Insert
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-public class JsonToDatabase {
     public static void main(String[] args) {
-        // Path to your JSON file
-        String jsonFilePath = "path/to/your/file.json";
-        String url = "jdbc:oracle:thin:@your_db_url";
-        String username = "your_username";
-        String password = "your_password";
-
-        // SQL insert statement
-        String sql = "INSERT INTO my_table (key_column, value_column) VALUES (?, ?)";
-
-        // Create ObjectMapper instance
-        ObjectMapper mapper = new ObjectMapper();
-
-        try (Connection conn = DriverManager.getConnection(url, username, password);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            // Read JSON file into a Map
-            Map<String, String> dataMap = mapper.readValue(new File(jsonFilePath), Map.class);
-
-            // Iterate over the map and insert data into the database
-            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-                stmt.setString(1, entry.getKey());
-                stmt.setString(2, entry.getValue()); // Assuming value is a string representation of JSON
-                stmt.addBatch(); // Add to batch for batch processing
-            }
-
-            // Execute batch insert
-            int[] insertCounts = stmt.executeBatch();
-            System.out.println("Inserted rows: " + insertCounts.length);
-
-        } catch (Exception e) {
+        try {
+            // Read from database and create JSON
+            JSONObject resultJson = readFromDatabase();
+            
+            // Write to output file
+            writeJsonToFile(resultJson, "output.json");
+            
+            System.out.println("JSON successfully reconstructed from database.");
+            
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static JSONObject readFromDatabase() throws SQLException {
+        JSONObject resultJson = new JSONObject();
+        String sql = "SELECT KEY_COL, VALUE_COL FROM JSON_STORE";
+        
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                String key = rs.getString("KEY_COL");
+                String valueStr = rs.getString("VALUE_COL");
+                // Parse the value string back into a JSONObject if it's a nested JSON
+                try {
+                    JSONObject valueJson = new JSONObject(valueStr);
+                    resultJson.put(key, valueJson);
+                } catch (Exception e) {
+                    // If parsing fails, store as is
+                    resultJson.put(key, valueStr);
+                }
+            }
+        }
+        return resultJson;
+    }
+
+    private static void writeJsonToFile(JSONObject json, String filename) throws IOException {
+        try (FileWriter file = new FileWriter(filename)) {
+            file.write(json.toString(2)); // Use indent of 2 spaces for pretty printing
         }
     }
 }
