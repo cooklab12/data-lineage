@@ -1,0 +1,159 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+@Service
+public class TaskVariableService {
+    // ... (previous code remains the same) ...
+
+    /**
+     * Process and update variables for a specific process ID
+     * @param processId The process ID to fetch variables for
+     * @return true if update successful, false if no twrkey found
+     */
+    @Transactional
+    public boolean updateVariablesByProcessId(String processId) {
+        try {
+            // Fetch all variables for the process
+            Map<String, Object> variables = runtimeService.getVariables(processId);
+            
+            // Check if twrkey exists
+            if (!variables.containsKey("twrkey")) {
+                return false;
+            }
+            
+            String twrkey = variables.get("twrkey").toString();
+            
+            // Create JSON with process information and variables
+            ObjectNode processJson = objectMapper.createObjectNode();
+            
+            // Add process metadata
+            processJson.put("processId", processId);
+            
+            // Add all variables
+            ObjectNode variablesNode = processJson.putObject("variables");
+            for (Map.Entry<String, Object> entry : variables.entrySet()) {
+                addVariableToJson(variablesNode, entry.getKey(), entry.getValue());
+            }
+            
+            // Update database
+            updateDatabase(twrkey, processJson.toString());
+            
+            return true;
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing variables for process ID " + processId + ": " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Process and update variables for multiple process IDs in parallel
+     * @param processIds List of process IDs to process
+     * @return Map of processId to success/failure status
+     */
+    @Transactional
+    public Map<String, Boolean> updateVariablesForMultipleProcessIds(List<String> processIds) {
+        try {
+            List<CompletableFuture<Map.Entry<String, Boolean>>> futures = processIds.stream()
+                .map(processId -> CompletableFuture.supplyAsync(
+                    () -> processVariablesForId(processId),
+                    executorService
+                ))
+                .collect(Collectors.toList());
+            
+            return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                    .map(CompletableFuture::join)
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                    )))
+                .get();
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing multiple process IDs: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Process variables for a single process ID
+     */
+    private Map.Entry<String, Boolean> processVariablesForId(String processId) {
+        try {
+            boolean success = updateVariablesByProcessId(processId);
+            return Map.entry(processId, success);
+        } catch (Exception e) {
+            // Log error but continue processing other IDs
+            logger.error("Error processing process ID {}: {}", processId, e.getMessage());
+            return Map.entry(processId, false);
+        }
+    }
+    
+    /**
+     * Update the database with new variable values
+     */
+    private void updateDatabase(String twrkey, String jsonValue) {
+        String sql = "MERGE INTO TASK_VARIABLES tv " +
+                    "USING DUAL " +
+                    "ON (tv.KEY = ?) " +
+                    "WHEN MATCHED THEN " +
+                    "  UPDATE SET tv.VALUE = ? " +
+                    "WHEN NOT MATCHED THEN " +
+                    "  INSERT (KEY, VALUE) VALUES (?, ?)";
+        
+        jdbcTemplate.update(sql, 
+            preparedStatement -> {
+                preparedStatement.setString(1, twrkey);
+                preparedStatement.setString(2, jsonValue);
+                preparedStatement.setString(3, twrkey);
+                preparedStatement.setString(4, jsonValue);
+            }
+        );
+    }
+    
+    /**
+     * Batch update multiple records
+     */
+    private void batchUpdateDatabase(List<KeyValuePair> pairs) {
+        String sql = "MERGE INTO TASK_VARIABLES tv " +
+                    "USING DUAL " +
+                    "ON (tv.KEY = ?) " +
+                    "WHEN MATCHED THEN " +
+                    "  UPDATE SET tv.VALUE = ? " +
+                    "WHEN NOT MATCHED THEN " +
+                    "  INSERT (KEY, VALUE) VALUES (?, ?)";
+        
+        for (int i = 0; i < pairs.size(); i += BATCH_SIZE) {
+            final List<KeyValuePair> batch = pairs.subList(
+                i, 
+                Math.min(i + BATCH_SIZE, pairs.size())
+            );
+            
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    KeyValuePair pair = batch.get(i);
+                    ps.setString(1, pair.key);
+                    ps.setString(2, pair.jsonValue);
+                    ps.setString(3, pair.key);
+                    ps.setString(4, pair.jsonValue);
+                }
+                
+                @Override
+                public int getBatchSize() {
+                    return batch.size();
+                }
+            });
+        }
+    }
+}
