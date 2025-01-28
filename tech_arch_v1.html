@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Architecture Diagram with Icons</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .mermaid {
+            font-family: 'Arial';
+            background: white;
+            padding: 40px;
+        }
+        
+        /* Icon styling */
+        .node i {
+            font-size: 1.5em;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        /* Custom node colors */
+        .user-node {
+            fill: #F3E5F5 !important;
+            stroke: #9C27B0 !important;
+        }
+        .angular-node {
+            fill: #DD0031 !important;
+            stroke: #B0002A !important;
+        }
+        .spring-node {
+            fill: #6DB33F !important;
+            stroke: #4A8F29 !important;
+        }
+        .aws-node {
+            fill: #FF9900 !important;
+            stroke: #CC7A00 !important;
+        }
+        
+        /* Text styling */
+        .node text {
+            fill: white !important;
+            font-weight: bold;
+        }
+        .user-node text {
+            fill: #9C27B0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+        graph LR
+            subgraph Client
+                A["<i class='fas fa-user'></i> User"] -->|Uploads Files| B["<i class='fab fa-angular'></i> Angular UI"]
+            end
+            
+            subgraph Backend
+                B -->|REST API| C["<i class='fas fa-leaf'></i> Spring Service"]
+                C -->|AWS SDK| D["<i class='fab fa-aws'></i> S3 Bucket"]
+            end
+
+            %% Style definitions
+            class A user-node;
+            class B angular-node;
+            class C spring-node;
+            class D aws-node;
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            securityLevel: 'loose',
+            theme: 'neutral',
+            flowchart: {
+                curve: 'basis',
+                nodeSpacing: 50,
+                rankSpacing: 80
+            }
+        });
+    </script>
+</body>
+</html>
