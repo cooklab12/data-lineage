@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC Pitch Deck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        /* Previous CSS remains the same */
+        /* Add these new styles */
+        .mermaid {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .architecture-diagram {
+            flex: 1;
+            min-height: 400px;
+        }
+
+        .fa-icon {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Previous slides 1-2 remain the same -->
+
+    <!-- Slide 3: Technical Components -->
+    <div class="slide" id="slide3">
+        <h2>Technical Architecture</h2>
+        <div class="architecture">
+            <pre class="mermaid architecture-diagram">
+            graph TD
+                subgraph UI_Layer["UI Layer (React) <i class='fa fa-layer-group fa-icon'></i>"]
+                    ui1[<i class='fa fa-sign-in-alt'></i> Auth]
+                    ui2[<i class='fa fa-chart-line'></i> Analytics]
+                    ui3[<i class='fa fa-shopping-cart'></i> Marketplace]
+                    ui4[<i class='fa fa-comments'></i> Social Feed]
+                    ui5[<i class='fa fa-cog'></i> Settings]
+                    ui6[<i class='fa fa-bell'></i> Notifications]
+                end
+
+                subgraph Service_Layer["Service Layer (Node.js) <i class='fa fa-server fa-icon'></i>"]
+                    svc1[<i class='fa fa-user-shield'></i> Auth Service]
+                    svc2[<i class='fa fa-coins'></i> Payment Service]
+                    svc3[<i class='fa fa-brain'></i> AI Service]
+                    svc4[<i class='fa fa-broadcast-tower'></i> Realtime Service]
+                    svc5[<i class='fa fa-file-export'></i> Export Service]
+                end
+
+                subgraph Data_Layer["Data Sources <i class='fa fa-database fa-icon'></i>"]
+                    db1[(<i class='fa fa-credit-card'></i> Payments DB)]
+                    db2[(<i class='fa fa-comment'></i> Social DB)]
+                    db3[(<i class='fa fa-history'></i> Time Series DB)]
+                    db4[(<i class='fa fa-image'></i> Media Storage)]
+                    db5[(<i class='fa fa-brain'></i> ML Models)]
+                end
+
+                UI_Layer -->|HTTP| Service_Layer
+                Service_Layer -->|gRPC| Data_Layer
+            </pre>
+        </div>
+    </div>
+
+    <!-- Slide 4: Architecture with Description -->
+    <div class="slide" id="slide4">
+        <h2>System Functionality</h2>
+        <div class="architecture">
+            <pre class="mermaid architecture-diagram">
+            graph TD
+                %% Same diagram as previous but with additional descriptions
+                subgraph UI_Layer["UI Layer (React) <i class='fa fa-layer-group fa-icon'></i>"]
+                    ui1[Auth] -->|Handles OAuth2<br>SSO integrations| svc1
+                    ui2[Analytics] -->|Real-time<br>data viz| svc3
+                    ui3[Marketplace] -->|Product<br>catalog| svc2
+                end
+
+                subgraph Service_Layer["Service Layer (Node.js) <i class='fa fa-server fa-icon'></i>"]
+                    svc1[Auth Service] -->|JWT tokens| db1
+                    svc2[Payment Service] -->|Stripe API| db1
+                    svc3[AI Service] -->|TensorFlow| db5
+                end
+
+                subgraph Data_Layer["Data Sources <i class='fa fa-database fa-icon'></i>"]
+                    db1[(Payments DB)] -->|ACID<br>Transactions| svc2
+                    db5[(ML Models)] -->|Model serving| svc3
+                end
+            </pre>
+            <div class="architecture-description">
+                <h3>Key Functionalities</h3>
+                <ul>
+                    <li><i class='fa fa-bolt'></i> Real-time updates using WebSockets</li>
+                    <li><i class='fa fa-shield-alt'></i> End-to-end encryption for sensitive data</li>
+                    <li><i class='fa fa-infinity'></i> Auto-scaling microservices architecture</li>
+                    <li><i class='fa fa-cloud'></i> Multi-cloud deployment strategy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: User Groups -->
+    <div class="slide" id="slide5">
+        <h2>User Groups & Value Proposition</h2>
+        <div class="architecture">
+            <pre class="mermaid architecture-diagram">
+            graph LR
+                %% Focus on data flow with users
+                Enterprise[<i class='fa fa-building'></i> Enterprise Users] -->|Manage teams| UI_Layer
+                Developers[<i class='fa fa-code'></i> Developers] -->|API Access| Service_Layer
+                Analysts[<i class='fa fa-chart-pie'></i> Analysts] -->|Export Data| Data_Layer
+
+                UI_Layer -->|Usage metrics| Service_Layer
+                Service_Layer -->|Business insights| Data_Layer
+                Data_Layer -->|Aggregated data| Service_Layer
+            </pre>
+            <div class="architecture-description">
+                <div class="users-list">
+                    <h3>Target Users</h3>
+                    <ul>
+                        <li><i class='fa fa-user-tie'></i> Enterprise Teams: Centralized management</li>
+                        <li><i class='fa fa-user-cog'></i> IT Admins: Compliance controls</li>
+                        <li><i class='fa fa-user-plus'></i> End Users: Intuitive interface</li>
+                    </ul>
+                </div>
+                <div class="value-prop">
+                    <h3>Business Value</h3>
+                    <ul>
+                        <li><i class='fa fa-clock'></i> 40% faster workflows</li>
+                        <li><i class='fa fa-dollar-sign'></i> 30% cost reduction</li>
+                        <li><i class='fa fa-chart-line'></i> Scalable to 1M+ users</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Previous navigation and script sections remain the same -->
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#74b9ff',
+                edgeLabelBackground: '#f8f9fa',
+                clusterBkg: '#dfe6e9'
+            }
+        });
+    </script>
+</body>
+</html>
