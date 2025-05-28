@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank - Data Quality Rule Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a4b8e;
+            --secondary-blue: #2a6fba;
+            --light-blue: #e6f0fa;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333333;
+            --white: #ffffff;
+            --border-color: #d1d1d1;
+            --success-green: #4caf50;
+            --warning-orange: #ff9800;
+            --error-red: #f44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 15px 0;
+            font-size: 14px;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Rule Builder Container */
+        .rule-builder {
+            background-color: var(--white);
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        /* Rule Header */
+        .rule-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .rule-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+        
+        .rule-actions button {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .rule-actions button.outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+        
+        /* Rule Body */
+        .rule-body {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        /* Rule Sidebar */
+        .rule-sidebar {
+            width: 250px;
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        
+        .rule-step {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .rule-step.active {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            border-left: 3px solid var(--primary-blue);
+        }
+        
+        .rule-step.completed {
+            color: var(--success-green);
+        }
+        
+        /* Rule Content */
+        .rule-content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .step-content {
+            display: none;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        /* Basic Info Step */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Rule Type Selection */
+        .rule-type-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .rule-type-card {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .rule-type-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .rule-type-card.selected {
+            border: 2px solid var(--primary-blue);
+            background-color: var(--light-blue);
+        }
+        
+        .rule-type-card i {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+        
+        .rule-type-card h3 {
+            margin: 0 0 10px;
+            color: var(--primary-blue);
+        }
+        
+        /* Rule Configuration */
+        .rule-configuration {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .rule-option {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: var(--white);
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+        
+        .rule-option:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        .rule-option.selected {
+            border: 2px solid var(--primary-blue);
+            background-color: var(--light-blue);
+        }
+        
+        .rule-option i {
+            margin-right: 10px;
+            color: var(--primary-blue);
+            font-size: 18px;
+        }
+        
+        .rule-option-content {
+            flex: 1;
+        }
+        
+        .rule-option h4 {
+            margin: 0 0 5px;
+        }
+        
+        .rule-option p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--dark-gray);
+        }
+        
+        /* Parameter Input */
+        .parameter-input {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .parameter-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .parameter-row label {
+            width: 150px;
+            font-weight: 500;
+        }
+        
+        .parameter-row input, 
+        .parameter-row select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+        
+        /* SQL Builder */
+        .sql-builder {
+            margin-top: 20px;
+        }
+        
+        .sql-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sql-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .sql-tab.active {
+            border-bottom-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .sql-content {
+            padding: 20px 0;
+        }
+        
+        .sql-visual-builder {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .sql-clause {
+            margin-bottom: 15px;
+        }
+        
+        .sql-clause h4 {
+            margin: 0 0 10px;
+        }
+        
+        .sql-conditions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sql-condition {
+            background-color: var(--light-blue);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sql-condition i {
+            margin-left: 8px;
+            cursor: pointer;
+            color: var(--error-red);
+        }
+        
+        .sql-add-condition {
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sql-add-condition i {
+            margin-right: 5px;
+        }
+        
+        .sql-text-editor {
+            margin-top: 20px;
+        }
+        
+        .sql-text-editor textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        /* AI Assistant */
+        .ai-assistant {
+            margin-top: 20px;
+            background-color: var(--light-blue);
+            padding: 20px;
+            border-radius: 6px;
+        }
+        
+        .ai-assistant h3 {
+            margin-top: 0;
+            color: var(--primary-blue);
+        }
+        
+        .ai-prompt {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .ai-prompt input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            border-right: none;
+        }
+        
+        .ai-prompt button {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .ai-suggestions {
+            margin-top: 15px;
+        }
+        
+        .ai-suggestion {
+            background-color: var(--white);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+        
+        .ai-suggestion:hover {
+            border-color: var(--primary-blue);
+        }
+        
+        /* Rule Preview */
+        .rule-preview {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        
+        .rule-preview h3 {
+            margin-top: 0;
+            color: var(--primary-blue);
+        }
+        
+        .preview-content {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+        
+        /* Condition Modal */
+        .condition-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .condition-modal.show {
+            display: flex;
+        }
+        
+        .condition-content {
+            background-color: var(--white);
+            width: 600px;
+            max-height: 80vh;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .condition-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .condition-header h3 {
+            margin: 0;
+        }
+        
+        .condition-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .condition-footer {
+            padding: 15px 20px;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .condition-footer button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://via.placeholder.com/40x40" alt="Bank Logo">
+            <h1>Bank - Data Quality Rule Builder</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">Data Catalog</a> &gt; <a href="#">Portfolio Holdings</a> &gt; <a href="#">market_value</a> &gt; <span>New Data Quality Rule</span>
+        </div>
+        
+        <div class="rule-builder">
+            <div class="rule-header">
+                <h2 class="rule-title">Create New Data Quality Rule</h2>
+                <div class="rule-actions">
+                    <button class="outline"><i class="fas fa-save"></i> Save Draft</button>
+                    <button><i class="fas fa-play"></i> Test Rule</button>
+                </div>
+            </div>
+            
+            <div class="rule-body">
+                <div class="rule-sidebar">
+                    <div class="rule-step active" data-step="basic">
+                        <i class="fas fa-info-circle"></i> Basic Information
+                    </div>
+                    <div class="rule-step" data-step="type">
+                        <i class="fas fa-tasks"></i> Rule Type
+                    </div>
+                    <div class="rule-step" data-step="configuration">
+                        <i class="fas fa-cog"></i> Rule Configuration
+                    </div>
+                    <div class="rule-step" data-step="preview">
+                        <i class="fas fa-eye"></i> Preview & Save
+                    </div>
+                </div>
+                
+                <div class="rule-content">
+                    <!-- Basic Information Step -->
+                    <div class="step-content active" id="basic-step">
+                        <h3>Basic Information</h3>
+                        <p>Provide basic details about your data quality rule.</p>
+                        
+                        <div class="form-group">
+                            <label for="ruleName">Rule Name*</label>
+                            <input type="text" id="ruleName" placeholder="e.g., Market Value Positive Check">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ruleDescription">Description</label>
+                            <textarea id="ruleDescription" placeholder="Describe what this rule checks for (optional)"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ruleSeverity">Severity Level</label>
+                            <select id="ruleSeverity">
+                                <option value="error">Error (Blocks processing)</option>
+                                <option value="warning">Warning (Allows processing)</option>
+                                <option value="info">Info (Notification only)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="rule-actions" style="justify-content: flex-end; margin-top: 20px;">
+                            <button class="outline" disabled><i class="fas fa-arrow-left"></i> Previous</button>
+                            <button id="nextToType"><i class="fas fa-arrow-right"></i> Next</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Rule Type Selection Step -->
+                    <div class="step-content" id="type-step">
+                        <h3>Select Rule Type</h3>
+                        <p>Choose the type of data quality rule you want to create.</p>
+                        
+                        <div class="rule-type-cards">
+                            <div class="rule-type-card" data-type="validation">
+                                <i class="fas fa-check-circle"></i>
+                                <h3>Validation Rule</h3>
+                                <p>Validate data against specific conditions or patterns</p>
+                            </div>
+                            <div class="rule-type-card" data-type="completeness">
+                                <i class="fas fa-database"></i>
+                                <h3>Completeness Rule</h3>
+                                <p>Check for missing or null values</p>
+                            </div>
+                            <div class="rule-type-card" data-type="consistency">
+                                <i class="fas fa-link"></i>
+                                <h3>Consistency Rule</h3>
+                                <p>Ensure values are consistent across related data</p>
+                            </div>
+                            <div class="rule-type-card" data-type="uniqueness">
+                                <i class="fas fa-fingerprint"></i>
+                                <h3>Uniqueness Rule</h3>
+                                <p>Verify unique constraints on columns</p>
+                            </div>
+                            <div class="rule-type-card" data-type="accuracy">
+                                <i class="fas fa-bullseye"></i>
+                                <h3>Accuracy Rule</h3>
+                                <p>Validate data against trusted sources</p>
+                            </div>
+                            <div class="rule-type-card" data-type="custom">
+                                <i class="fas fa-code"></i>
+                                <h3>Custom SQL Rule</h3>
+                                <p>Write your own SQL validation logic</p>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-actions" style="justify-content: space-between; margin-top: 20px;">
+                            <button class="outline" id="backToBasic"><i class="fas fa-arrow-left"></i> Previous</button>
+                            <button id="nextToConfig" disabled><i class="fas fa-arrow-right"></i> Next</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Rule Configuration Step -->
+                    <div class="step-content" id="configuration-step">
+                        <h3>Configure Rule</h3>
+                        <p>Define the specific conditions for your data quality rule.</p>
+                        
+                        <div id="validation-config" class="rule-configuration">
+                            <h4>Validation Options</h4>
+                            
+                            <div class="rule-option selected" data-option="not-null">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="rule-option-content">
+                                    <h4>Not Null Check</h4>
+                                    <p>Ensure the column has no null values</p>
+                                </div>
+                            </div>
+                            
+                            <div class="rule-option" data-option="value-range">
+                                <i class="fas fa-less-than-equal"></i>
+                                <div class="rule-option-content">
+                                    <h4>Value Range</h4>
+                                    <p>Check if values fall within a specified range</p>
+                                </div>
+                            </div>
+                            
+                            <div class="rule-option" data-option="regex">
+                                <i class="fas fa-font"></i>
+                                <div class="rule-option-content">
+                                    <h4>Pattern Matching</h4>
+                                    <p>Validate against a regular expression pattern</p>
+                                </div>
+                            </div>
+                            
+                            <div class="rule-option" data-option="value-set">
+                                <i class="fas fa-list-ol"></i>
+                                <div class="rule-option-content">
+                                    <h4>Allowed Values</h4>
+                                    <p>Check if values are in a specified set</p>
+                                </div>
+                            </div>
+                            
+                            <div class="rule-option" data-option="reference">
+                                <i class="fas fa-project-diagram"></i>
+                                <div class="rule-option-content">
+                                    <h4>Reference Check</h4>
+                                    <p>Validate against values in another table</p>
+                                </div>
+                            </div>
+                            
+                            <div class="parameter-input" id="not-null-params">
+                                <h4>Not Null Parameters</h4>
+                                <p>This rule will fail if any null values are found in the column.</p>
+                            </div>
+                            
+                            <div class="parameter-input" id="value-range-params" style="display: none;">
+                                <h4>Value Range Parameters</h4>
+                                <div class="parameter-row">
+                                    <label>Minimum Value:</label>
+                                    <input type="number" placeholder="Enter minimum value">
+                                </div>
+                                <div class="parameter-row">
+                                    <label>Maximum Value:</label>
+                                    <input type="number" placeholder="Enter maximum value">
+                                </div>
+                                <div class="parameter-row">
+                                    <label>Inclusive:</label>
+                                    <select>
+                                        <option value="yes">Yes (include boundaries)</option>
+                                        <option value="no">No (exclude boundaries)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="sql-config" class="sql-builder" style="display: none;">
+                            <h4>SQL Rule Builder</h4>
+                            
+                            <div class="sql-tabs">
+                                <div class="sql-tab active" data-tab="visual">Visual Builder</div>
+                                <div class="sql-tab" data-tab="text">SQL Editor</div>
+                                <div class="sql-tab" data-tab="ai">AI Assistant</div>
+                            </div>
+                            
+                            <div class="sql-content">
+                                <div id="visual-builder" class="sql-visual-builder">
+                                    <div class="sql-clause">
+                                        <h4>WHERE Clause Conditions</h4>
+                                        <div class="sql-conditions">
+                                            <div class="sql-condition">
+                                                market_value IS NOT NULL
+                                                <i class="fas fa-times"></i>
+                                            </div>
+                                            <div class="sql-condition">
+                                                market_value >= 0
+                                                <i class="fas fa-times"></i>
+                                            </div>
+                                        </div>
+                                        <div class="sql-add-condition" onclick="openConditionModal()">
+                                            <i class="fas fa-plus"></i> Add Condition
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="sql-clause">
+                                        <h4>Additional Validation</h4>
+                                        <div class="sql-conditions">
+                                            <!-- Conditions would be added here -->
+                                        </div>
+                                        <div class="sql-add-condition">
+                                            <i class="fas fa-plus"></i> Add Validation
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="text-editor" class="sql-text-editor" style="display: none;">
+                                    <textarea placeholder="Write your SQL WHERE clause conditions here...">market_value IS NOT NULL AND market_value >= 0</textarea>
+                                </div>
+                                
+                                <div id="ai-assistant" class="ai-assistant" style="display: none;">
+                                    <h3>AI Rule Assistant</h3>
+                                    <p>Describe the rule you want to create in natural language, and our AI will generate the SQL for you.</p>
+                                    
+                                    <div class="ai-prompt">
+                                        <input type="text" placeholder="e.g., 'Ensure market value is positive and not null'">
+                                        <button><i class="fas fa-arrow-right"></i></button>
+                                    </div>
+                                    
+                                    <div class="ai-suggestions">
+                                        <p>Try one of these examples:</p>
+                                        <div class="ai-suggestion">
+                                            "Check that market_value is between 0 and 1 million"
+                                        </div>
+                                        <div class="ai-suggestion">
+                                            "Verify that market_value matches the quantity multiplied by the price from security master"
+                                        </div>
+                                        <div class="ai-suggestion">
+                                            "Ensure market_value is not null and updated within the last 30 days"
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-actions" style="justify-content: space-between; margin-top: 20px;">
+                            <button class="outline" id="backToType"><i class="fas fa-arrow-left"></i> Previous</button>
+                            <button id="nextToPreview"><i class="fas fa-arrow-right"></i> Next</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview & Save Step -->
+                    <div class="step-content" id="preview-step">
+                        <h3>Review and Save Rule</h3>
+                        <p>Verify your rule configuration before saving.</p>
+                        
+                        <div class="rule-preview">
+                            <h4>Rule Summary</h4>
+                            <div class="preview-content">
+                                <p><strong>Name:</strong> Market Value Positive Check</p>
+                                <p><strong>Type:</strong> Validation Rule</p>
+                                <p><strong>Severity:</strong> Error</p>
+                                <p><strong>Description:</strong> Ensures market_value is not null and positive</p>
+                                <p><strong>Configuration:</strong></p>
+                                <ul>
+                                    <li>Not Null Check: Enabled</li>
+                                    <li>Value Range: market_value >= 0</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-preview">
+                            <h4>Rule Logic Preview</h4>
+                            <div class="preview-content">
+                                -- SQL that will be executed:<br>
+                                SELECT COUNT(*) AS invalid_count<br>
+                                FROM portfolio_holdings<br>
+                                WHERE market_value IS NULL OR market_value &lt; 0
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>
+                                <input type="checkbox"> Activate this rule immediately after saving
+                            </label>
+                        </div>
+                        
+                        <div class="rule-actions" style="justify-content: space-between; margin-top: 20px;">
+                            <button class="outline" id="backToConfig"><i class="fas fa-arrow-left"></i> Previous</button>
+                            <button id="saveRule"><i class="fas fa-save"></i> Save Rule</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Condition Modal -->
+    <div class="condition-modal" id="conditionModal">
+        <div class="condition-content">
+            <div class="condition-header">
+                <h3>Add Condition</h3>
+                <button class="modal-close" onclick="closeConditionModal()">&times;</button>
+            </div>
+            <div class="condition-body">
+                <div class="form-group">
+                    <label>Column:</label>
+                    <select>
+                        <option>market_value</option>
+                        <option>portfolio_id</option>
+                        <option>security_id</option>
+                        <option>holding_date</option>
+                        <option>quantity</option>
+                        <option>cost_basis</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Operator:</label>
+                    <select>
+                        <option>= (Equals)</option>
+                        <option>!= (Not Equals)</option>
+                        <option>&lt; (Less Than)</option>
+                        <option>&lt;= (Less Than or Equal)</option>
+                        <option>&gt; (Greater Than)</option>
+                        <option>&gt;= (Greater Than or Equal)</option>
+                        <option>IS NULL</option>
+                        <option>IS NOT NULL</option>
+                        <option>LIKE (Pattern Match)</option>
+                        <option>IN (Value List)</option>
+                        <option>BETWEEN (Range)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Value:</label>
+                    <input type="text" placeholder="Enter comparison value (if applicable)">
+                </div>
+            </div>
+            <div class="condition-footer">
+                <button class="outline" onclick="closeConditionModal()">Cancel</button>
+                <button onclick="addCondition()">Add Condition</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div>Bank Data Quality Management &copy; 2023 | Version 3.2.0</div>
+    </footer>
+    
+    <script>
+        // Navigation between steps
+        document.getElementById('nextToType').addEventListener('click', function() {
+            navigateToStep('type');
+        });
+        
+        document.getElementById('backToBasic').addEventListener('click', function() {
+            navigateToStep('basic');
+        });
+        
+        document.getElementById('nextToConfig').addEventListener('click', function() {
+            navigateToStep('configuration');
+        });
+        
+        document.getElementById('backToType').addEventListener('click', function() {
+            navigateToStep('type');
+        });
+        
+        document.getElementById('nextToPreview').addEventListener('click', function() {
+            navigateToStep('preview');
+        });
+        
+        document.getElementById('backToConfig').addEventListener('click', function() {
+            navigateToStep('configuration');
+        });
+        
+        function navigateToStep(step) {
+            // Update sidebar
+            document.querySelectorAll('.rule-step').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.step === step) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === step + '-step') {
+                    content.classList.add('active');
+                }
+            });
+        }
+        
+        // Rule type selection
+        document.querySelectorAll('.rule-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.rule-type-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('nextToConfig').disabled = false;
+                
+                // Show appropriate config section
+                if (this.dataset.type === 'custom') {
+                    document.getElementById('validation-config').style.display = 'none';
+                    document.getElementById('sql-config').style.display = 'block';
+                } else {
+                    document.getElementById('validation-config').style.display = 'block';
+                    document.getElementById('sql-config').style.display = 'none';
+                }
+            });
+        });
+        
+        // Rule option selection
+        document.querySelectorAll('.rule-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.rule-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Show appropriate parameters
+                document.querySelectorAll('.parameter-input').forEach(input => {
+                    input.style.display = 'none';
+                });
+                
+                const paramId = this.dataset.option + '-params';
+                if (document.getElementById(paramId)) {
+                    document.getElementById(paramId).style.display = 'block';
+                }
+            });
+        });
+        
+        // SQL tab switching
+        document.querySelectorAll('.sql-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.sql-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.getElementById('visual-builder').style.display = 'none';
+                document.getElementById('text-editor').style.display = 'none';
+                document.getElementById('ai-assistant').style.display = 'none';
+                
+                if (this.dataset.tab === 'visual') {
+                    document.getElementById('visual-builder').style.display = 'block';
+                } else if (this.dataset.tab === 'text') {
+                    document.getElementById('text-editor').style.display = 'block';
+                } else {
+                    document.getElementById('ai-assistant').style.display = 'block';
+                }
+            });
+        });
+        
+        // Condition modal functions
+        function openConditionModal() {
+            document.getElementById('conditionModal').classList.add('show');
+        }
+        
+        function closeConditionModal() {
+            document.getElementById('conditionModal').classList.remove('show');
+        }
+        
+        function addCondition() {
+            // In a real app, this would add the condition to the visual builder
+            alert('Condition would be added in a real implementation');
+            closeConditionModal();
+        }
+        
+        // Save rule
+        document.getElementById('saveRule').addEventListener('click', function() {
+            alert('Rule would be saved in a real implementation');
+            // In a real app, this would submit the form or make an API call
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('conditionModal')) {
+                closeConditionModal();
+            }
+        });
+    </script>
+</body>
+</html>
