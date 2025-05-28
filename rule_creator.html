@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Repository - Data Catalog</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a4b8e;
+            --secondary-blue: #2a6fba;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #333333;
+            --white: #ffffff;
+            --border-color: #d1d1d1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .container {
+            display: flex;
+            min-height: calc(100vh - 120px);
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 22px;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 300px;
+            background-color: var(--white);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        
+        .search-box {
+            padding: 0 20px 15px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .domain-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .domain-item {
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .domain-header {
+            padding: 12px 20px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .domain-header:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .table-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: none;
+            background-color: var(--light-gray);
+        }
+        
+        .table-list.show {
+            display: block;
+        }
+        
+        .table-item {
+            padding: 10px 20px 10px 30px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .table-item:hover {
+            background-color: var(--medium-gray);
+        }
+        
+        .table-item.active {
+            background-color: var(--secondary-blue);
+            color: white;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .table-title {
+            font-size: 24px;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+        
+        .table-actions button {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .table-actions button:hover {
+            background-color: var(--secondary-blue);
+        }
+        
+        .table-description {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-blue);
+        }
+        
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .metadata-item {
+            background-color: var(--white);
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .metadata-item span:first-child {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-right: 5px;
+        }
+        
+        /* Columns Table Styles */
+        .columns-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--white);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .columns-table th {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .columns-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .columns-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .columns-table tr:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .critical-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .critical-tag.true {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        
+        .critical-tag.false {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .action-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .action-btn.primary {
+            background-color: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+        
+        .action-btn.primary:hover {
+            background-color: var(--secondary-blue);
+        }
+        
+        /* Rule Configuration Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            width: 700px;
+            max-height: 80vh;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .rule-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .rule-type-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .rule-type-tab.active {
+            border-bottom-color: var(--primary-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+        
+        .rule-examples {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        
+        .rule-examples h4 {
+            margin-top: 0;
+            color: var(--primary-blue);
+        }
+        
+        .rule-examples ul {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer button {
+            margin-left: 10px;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="https://via.placeholder.com/40x40" alt="Bank Logo">
+            <h1>Data Repository - Data Catalog</h1>
+        </div>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span>John Doe (Data Steward)</span>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="search-box">
+                <input type="text" placeholder="Search domains, tables...">
+            </div>
+            <ul class="domain-list">
+                <li class="domain-item">
+                    <div class="domain-header">
+                        <span>Investments</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <ul class="table-list">
+                        <li class="table-item active">Portfolio Holdings</li>
+                        <li class="table-item">Trade Transactions</li>
+                        <li class="table-item">Security Master</li>
+                        <li class="table-item">Performance Metrics</li>
+                    </ul>
+                </li>
+                <li class="domain-item">
+                    <div class="domain-header">
+                        <span>Lending</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <ul class="table-list">
+                        <li class="table-item">Loan Applications</li>
+                        <li class="table-item">Loan Portfolio</li>
+                        <li class="table-item">Collateral</li>
+                    </ul>
+                </li>
+                <li class="domain-item">
+                    <div class="domain-header">
+                        <span>Tax</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <ul class="table-list">
+                        <li class="table-item">Withholding Tax</li>
+                        <li class="table-item">Tax Liabilities</li>
+                    </ul>
+                </li>
+                <li class="domain-item">
+                    <div class="domain-header">
+                        <span>Customer</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <ul class="table-list">
+                        <li class="table-item">Customer Master</li>
+                        <li class="table-item">Customer Accounts</li>
+                        <li class="table-item">Customer Transactions</li>
+                    </ul>
+                </li>
+                <li class="domain-item">
+                    <div class="domain-header">
+                        <span>Compliance</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    <ul class="table-list">
+                        <li class="table-item">KYC Records</li>
+                        <li class="table-item">AML Alerts</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="table-header">
+                <h2 class="table-title">Portfolio Holdings</h2>
+                <div class="table-actions">
+                    <button><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <button><i class="fas fa-download"></i> Export</button>
+                </div>
+            </div>
+            
+            <div class="table-description">
+                <p>This table contains detailed information about all investment holdings across portfolios, including security identifiers, quantities, values, and other relevant attributes. Used for portfolio analysis, risk management, and regulatory reporting.</p>
+            </div>
+            
+            <div class="metadata-grid">
+                <div class="metadata-item">
+                    <span>Owner:</span>
+                    <span>Investment Operations Team</span>
+                </div>
+                <div class="metadata-item">
+                    <span>Data Domain:</span>
+                    <span>Investments</span>
+                </div>
+                <div class="metadata-item">
+                    <span>Update Frequency:</span>
+                    <span>Daily</span>
+                </div>
+                <div class="metadata-item">
+                    <span>Retention Period:</span>
+                    <span>7 years</span>
+                </div>
+                <div class="metadata-item">
+                    <span>Sensitive Data:</span>
+                    <span>Yes</span>
+                </div>
+                <div class="metadata-item">
+                    <span>GDPR Classification:</span>
+                    <span>PII Present</span>
+                </div>
+            </div>
+            
+            <table class="columns-table">
+                <thead>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Data Type</th>
+                        <th>Critical</th>
+                        <th>Description</th>
+                        <th>Rules</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>portfolio_id</td>
+                        <td>VARCHAR(20)</td>
+                        <td><span class="critical-tag true">Yes</span></td>
+                        <td>Unique identifier for the portfolio</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                            <span class="rule-tag">Format: P-[0-9]{8}</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>security_id</td>
+                        <td>VARCHAR(20)</td>
+                        <td><span class="critical-tag true">Yes</span></td>
+                        <td>Identifier for the security/asset</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                            <span class="rule-tag">Valid in Security Master</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>holding_date</td>
+                        <td>DATE</td>
+                        <td><span class="critical-tag true">Yes</span></td>
+                        <td>Date of the holding record</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                            <span class="rule-tag">Within past 5 years</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>quantity</td>
+                        <td>DECIMAL(20,6)</td>
+                        <td><span class="critical-tag true">Yes</span></td>
+                        <td>Number of units held</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                            <span class="rule-tag">>= 0</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>market_value</td>
+                        <td>DECIMAL(20,2)</td>
+                        <td><span class="critical-tag true">Yes</span></td>
+                        <td>Market value in base currency</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                            <span class="rule-tag">>= 0</span>
+                            <span class="rule-tag">Within 3 std deviations</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>cost_basis</td>
+                        <td>DECIMAL(20,2)</td>
+                        <td><span class="critical-tag false">No</span></td>
+                        <td>Original cost of the position</td>
+                        <td>
+                            <span class="rule-tag">>= 0</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>last_updated</td>
+                        <td>TIMESTAMP</td>
+                        <td><span class="critical-tag false">No</span></td>
+                        <td>When the record was last updated</td>
+                        <td>
+                            <span class="rule-tag">Not Null</span>
+                        </td>
+                        <td>
+                            <button class="action-btn primary" onclick="openRuleModal()"><i class="fas fa-plus"></i> Rule</button>
+                            <button class="action-btn"><i class="fas fa-edit"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Rule Configuration Modal -->
+    <div class="modal" id="ruleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Configure Data Quality Rule</h3>
+                <button class="modal-close" onclick="closeRuleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="columnName">Column:</label>
+                    <input type="text" id="columnName" value="market_value" readonly>
+                </div>
+                
+                <div class="rule-type-selector">
+                    <div class="rule-type-tab active" onclick="switchRuleType('simple')">Simple Rules</div>
+                    <div class="rule-type-tab" onclick="switchRuleType('complex')">Complex Rules</div>
+                    <div class="rule-type-tab" onclick="switchRuleType('sql')">SQL Expression</div>
+                </div>
+                
+                <div id="simpleRuleSection">
+                    <div class="form-group">
+                        <label for="simpleRuleType">Rule Type:</label>
+                        <select id="simpleRuleType">
+                            <option value="">Select a rule type</option>
+                            <option value="not_null">Not Null</option>
+                            <option value="data_type">Data Type Check</option>
+                            <option value="min_value">Minimum Value</option>
+                            <option value="max_value">Maximum Value</option>
+                            <option value="value_range">Value Range</option>
+                            <option value="regex">Regex Pattern</option>
+                            <option value="in_list">Value in List</option>
+                            <option value="unique">Unique Values</option>
+                            <option value="completeness">Completeness</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="ruleParamsContainer">
+                        <!-- Dynamic parameters will be inserted here based on rule type -->
+                    </div>
+                    
+                    <div class="rule-examples">
+                        <h4>Common Simple Rules:</h4>
+                        <ul>
+                            <li>Not Null: Ensures the column has no null values</li>
+                            <li>Minimum Value: Value must be greater than X</li>
+                            <li>Regex Pattern: Value must match pattern (e.g., email format)</li>
+                            <li>Value in List: Value must be one of the specified values</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="complexRuleSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="complexRuleDSL">Rule DSL (Domain Specific Language):</label>
+                        <textarea id="complexRuleDSL" placeholder="Enter rule using our data quality DSL"></textarea>
+                    </div>
+                    
+                    <div class="rule-examples">
+                        <h4>DSL Examples:</h4>
+                        <ul>
+                            <li><code>column("price") should be greaterThan(0)</code></li>
+                            <li><code>column("email") should matchPattern("[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}")</code></li>
+                            <li><code>column("start_date") should be before(column("end_date"))</code></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div id="sqlRuleSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="sqlExpression">SQL Expression (WHERE clause condition):</label>
+                        <textarea id="sqlExpression" placeholder="Enter SQL condition that valid rows must satisfy"></textarea>
+                    </div>
+                    
+                    <div class="rule-examples">
+                        <h4>SQL Examples:</h4>
+                        <ul>
+                            <li><code>LENGTH(TRIM(customer_name)) > 0</code></li>
+                            <li><code>age BETWEEN 18 AND 120</code></li>
+                            <li><code>REGEXP_LIKE(email, '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$')</code></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruleDescription">Description (optional):</label>
+                    <input type="text" id="ruleDescription" placeholder="Describe what this rule checks for">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" onclick="closeRuleModal()">Cancel</button>
+                <button class="action-btn primary">Save Rule</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Documentation</a>
+            <a href="#">Data Governance</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+        <div>Bank Data Repository &copy; 2023 | Version 2.4.1</div>
+    </footer>
+    
+    <script>
+        // Toggle domain expansion
+        document.querySelectorAll('.domain-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const icon = header.querySelector('i');
+                const list = header.nextElementSibling;
+                
+                if (list.classList.contains('show')) {
+                    list.classList.remove('show');
+                    icon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                } else {
+                    list.classList.add('show');
+                    icon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                }
+            });
+        });
+        
+        // Table selection
+        document.querySelectorAll('.table-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.table-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                // In a real app, you would load the table details here
+            });
+        });
+        
+        // Rule modal functions
+        function openRuleModal() {
+            document.getElementById('ruleModal').classList.add('show');
+        }
+        
+        function closeRuleModal() {
+            document.getElementById('ruleModal').classList.remove('show');
+        }
+        
+        function switchRuleType(type) {
+            // Update tabs
+            document.querySelectorAll('.rule-type-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide sections
+            document.getElementById('simpleRuleSection').style.display = 'none';
+            document.getElementById('complexRuleSection').style.display = 'none';
+            document.getElementById('sqlRuleSection').style.display = 'none';
+            
+            document.getElementById(type + 'RuleSection').style.display = 'block';
+        }
+        
+        // Simple rule type change handler
+        document.getElementById('simpleRuleType').addEventListener('change', function() {
+            const ruleType = this.value;
+            const paramsContainer = document.getElementById('ruleParamsContainer');
+            
+            // Clear previous parameters
+            paramsContainer.innerHTML = '';
+            
+            if (!ruleType) return;
+            
+            // Add parameters based on rule type
+            switch(ruleType) {
+                case 'not_null':
+                    // No parameters needed
+                    break;
+                case 'data_type':
+                    paramsContainer.innerHTML = `
+                        <label for="dataType">Expected Data Type:</label>
+                        <select id="dataType">
+                            <option value="string">String</option>
+                            <option value="number">Number</option>
+                            <option value="integer">Integer</option>
+                            <option value="date">Date</option>
+                            <option value="boolean">Boolean</option>
+                        </select>
+                    `;
+                    break;
+                case 'min_value':
+                case 'max_value':
+                    paramsContainer.innerHTML = `
+                        <label for="thresholdValue">Threshold Value:</label>
+                        <input type="text" id="thresholdValue" placeholder="Enter threshold value">
+                    `;
+                    break;
+                case 'value_range':
+                    paramsContainer.innerHTML = `
+                        <label for="minValue">Minimum Value:</label>
+                        <input type="text" id="minValue" placeholder="Enter minimum value">
+                        <label for="maxValue">Maximum Value:</label>
+                        <input type="text" id="maxValue" placeholder="Enter maximum value">
+                    `;
+                    break;
+                case 'regex':
+                    paramsContainer.innerHTML = `
+                        <label for="regexPattern">Regex Pattern:</label>
+                        <input type="text" id="regexPattern" placeholder="Enter regex pattern">
+                    `;
+                    break;
+                case 'in_list':
+                    paramsContainer.innerHTML = `
+                        <label for="allowedValues">Allowed Values (comma separated):</label>
+                        <textarea id="allowedValues" placeholder="value1, value2, value3"></textarea>
+                    `;
+                    break;
+            }
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('ruleModal')) {
+                closeRuleModal();
+            }
+        });
+    </script>
+</body>
+</html>
