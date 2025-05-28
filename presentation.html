@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Quality UI Presentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            display: none;
+        }
+        .slide.active {
+            display: block;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .img-container {
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        .img-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 5px;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature {
+            flex: 1 1 200px;
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title Slide -->
+    <div class="slide active" id="slide1">
+        <h1>Data Quality UI Workflow</h1>
+        <h2>From Data Catalog to Rule Implementation</h2>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Data+Quality+Dashboard" alt="Data Quality Dashboard">
+            <div class="caption">Figure 1: Overview of our Data Quality UI</div>
+        </div>
+        <p>This presentation walks through our comprehensive Data Quality workflow, from data discovery to rule implementation.</p>
+    </div>
+
+    <!-- Slide 2: Data Catalog Overview -->
+    <div class="slide" id="slide2">
+        <h1>1. Data Catalog: The Starting Point</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Data+Catalog+View" alt="Data Catalog">
+            <div class="caption">Figure 2: Our existing Data Catalog interface</div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <strong>Metadata Management</strong>
+                <p>Central repository for all data assets with technical and business metadata</p>
+            </div>
+            <div class="feature">
+                <strong>Search & Discovery</strong>
+                <p>Powerful search capabilities to find relevant datasets</p>
+            </div>
+            <div class="feature">
+                <strong>Lineage Tracking</strong>
+                <p>Visualize data flow and dependencies between systems</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: Initiating Data Profiling -->
+    <div class="slide" id="slide3">
+        <h1>2. Initiating Data Profiling</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Data+Profiling+Options" alt="Data Profiling Options">
+            <div class="caption">Figure 3: Data profiling initiation from the catalog</div>
+        </div>
+        <ul>
+            <li>Right-click on any dataset in the catalog to access profiling options</li>
+            <li>Choose between quick profile (basic statistics) or full profile (detailed analysis)</li>
+            <li>Profile results help identify potential data quality issues automatically</li>
+            <li>Historical profiling data available for trend analysis</li>
+        </ul>
+    </div>
+
+    <!-- Slide 4: Data Profiling Results -->
+    <div class="slide" id="slide4">
+        <h1>3. Data Profiling Results Analysis</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Profiling+Results+Dashboard" alt="Profiling Results">
+            <div class="caption">Figure 4: Detailed profiling results dashboard</div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <strong>Column Statistics</strong>
+                <p>Null counts, distinct values, patterns, min/max, data distribution</p>
+            </div>
+            <div class="feature">
+                <strong>Quality Indicators</strong>
+                <p>Automatically flagged potential issues based on statistical analysis</p>
+            </div>
+            <div class="feature">
+                <strong>Comparison Tools</strong>
+                <p>Compare current profile with historical versions or other datasets</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Rule Suggestion Engine -->
+    <div class="slide" id="slide5">
+        <h1>4. Intelligent Rule Suggestions</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Rule+Suggestion+Panel" alt="Rule Suggestions">
+            <div class="caption">Figure 5: AI-powered rule suggestions based on profiling</div>
+        </div>
+        <ul>
+            <li>System analyzes profiling results to recommend appropriate rules</li>
+            <li>Suggestions categorized by DQ dimension (completeness, validity, etc.)</li>
+            <li>Click any suggestion to see preview of what it would catch</li>
+            <li>Accept suggestions with one click or customize further</li>
+        </ul>
+    </div>
+
+    <!-- Slide 6: Standard Rule Templates -->
+    <div class="slide" id="slide6">
+        <h1>5. Standard Rule Templates</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Standard+Rule+Templates" alt="Standard Rules">
+            <div class="caption">Figure 6: Library of standard rule templates</div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <strong>Completeness Rules</strong>
+                <p>Null checks, empty string detection, required fields</p>
+            </div>
+            <div class="feature">
+                <strong>Validity Rules</strong>
+                <p>Format validation, regex patterns, value ranges</p>
+            </div>
+            <div class="feature">
+                <strong>Consistency Rules</strong>
+                <p>Cross-field validation, referential integrity</p>
+            </div>
+            <div class="feature">
+                <strong>Uniqueness Rules</strong>
+                <p>Duplicate detection, primary key validation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Rule Builder Interface -->
+    <div class="slide" id="slide7">
+        <h1>6. Visual Rule Builder</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Visual+Rule+Builder" alt="Rule Builder">
+            <div class="caption">Figure 7: Drag-and-drop rule builder interface</div>
+        </div>
+        <ul>
+            <li>Intuitive interface for building rules without coding</li>
+            <li>Drag-and-drop components for common conditions</li>
+            <li>Real-time validation and preview of rule impact</li>
+            <li>Save custom rules to personal or shared libraries</li>
+        </ul>
+    </div>
+
+    <!-- Slide 8: SQL Rule Builder -->
+    <div class="slide" id="slide8">
+        <h1>7. Advanced SQL Rule Builder</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=SQL+Rule+Builder" alt="SQL Builder">
+            <div class="caption">Figure 8: SQL builder for complex rule creation</div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <strong>Code Editor</strong>
+                <p>Syntax highlighting, autocomplete, and schema awareness</p>
+            </div>
+            <div class="feature">
+                <strong>Template Library</strong>
+                <p>Common SQL patterns for quick implementation</p>
+            </div>
+            <div class="feature">
+                <strong>Validation Tools</strong>
+                <p>Test queries against sample data before saving</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: AI-Assisted Rule Creation -->
+    <div class="slide" id="slide9">
+        <h1>8. AI-Assisted Rule Creation</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=AI+Rule+Generation" alt="AI Rule Generation">
+            <div class="caption">Figure 9: Natural language to rule conversion</div>
+        </div>
+        <ul>
+            <li>Describe your rule in plain English ("flag orders with amounts over $10,000")</li>
+            <li>AI converts description to executable rule logic</li>
+            <li>Review and edit the generated rule before saving</li>
+            <li>Learning system improves suggestions based on user feedback</li>
+        </ul>
+    </div>
+
+    <!-- Slide 10: Rule Testing & Simulation -->
+    <div class="slide" id="slide10">
+        <h1>9. Rule Testing & Simulation</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Rule+Testing+Interface" alt="Rule Testing">
+            <div class="caption">Figure 10: Testing rules against sample data</div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <strong>Sample Data</strong>
+                <p>Test against recent data or hand-picked examples</p>
+            </div>
+            <div class="feature">
+                <strong>Impact Analysis</strong>
+                <p>See how many records would fail the rule</p>
+            </div>
+            <div class="feature">
+                <strong>False Positive Check</strong>
+                <p>Review records flagged by the rule to validate logic</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Rule Deployment & Monitoring -->
+    <div class="slide" id="slide11">
+        <h1>10. Rule Deployment & Monitoring</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=Rule+Deployment+Options" alt="Rule Deployment">
+            <div class="caption">Figure 11: Deployment options and scheduling</div>
+        </div>
+        <ul>
+            <li>Deploy to various environments with one click</li>
+            <li>Schedule regular execution or run on-demand</li>
+            <li>Set up alerts for rule violations</li>
+            <li>Monitor rule performance over time</li>
+        </ul>
+    </div>
+
+    <!-- Slide 12: Summary & Next Steps -->
+    <div class="slide" id="slide12">
+        <h1>Summary & Next Steps</h1>
+        <div class="img-container">
+            <img src="https://via.placeholder.com/800x400?text=End-to-End+DQ+Workflow" alt="DQ Workflow">
+            <div class="caption">Figure 12: Our complete Data Quality workflow</div>
+        </div>
+        <h2>Key Benefits:</h2>
+        <ul>
+            <li>Seamless integration from data discovery to rule implementation</li>
+            <li>Multiple rule creation options for users of all technical levels</li>
+            <li>AI-powered assistance reduces time to implement quality checks</li>
+            <li>Comprehensive testing ensures rules work as intended</li>
+        </ul>
+        <h2>Next Steps:</h2>
+        <p>Begin with high-impact datasets, implement baseline rules, and expand coverage iteratively.</p>
+    </div>
+
+    <div class="nav">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12;
+        
+        function showSlide(n) {
+            currentSlide = n;
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            document.getElementById(`slide${n}`).classList.add('active');
+            
+            document.getElementById('prevBtn').disabled = n === 1;
+            document.getElementById('nextBtn').disabled = n === totalSlides;
+        }
+        
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentSlide > 1) showSlide(currentSlide - 1);
+        });
+        
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+        });
+        
+        // Initialize
+        showSlide(1);
+    </script>
+</body>
+</html>
