@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AI for Data Engineering – Cloud Integration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/white.css" id="theme">
+  <style>
+    h2 { color: #003366; }
+    ul { font-size: 1.05em; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- Slide 1 -->
+    <section>
+      <h2>Cloud Integration Strategy</h2>
+      <ul>
+        <li>Shift from Hive to Snowflake as core data platform</li>
+        <li>Adopt hybrid/multi-cloud: AWS, GCP, Databricks</li>
+        <li>Goal: Scalable, AI-powered, metadata-rich pipelines</li>
+        <li>Key Focus: Ingestion, processing, observability, cost control</li>
+      </ul>
+    </section>
+
+    <!-- Slide 2 -->
+    <section>
+      <h2>Snowflake: Cloud-Native Data Platform</h2>
+      <ul>
+        <li>Supports structured/semi-structured (JSON, Avro, Parquet)</li>
+        <li>Snowpark: run Java/Python/PySpark code close to data</li>
+        <li>ML support via Snowflake ML (built-in model training & scoring)</li>
+        <li>Native connectors for ingestion from Hive or S3/GCS</li>
+        <li>Secure Data Sharing: sandboxing for data science teams</li>
+      </ul>
+    </section>
+
+    <!-- Slide 3 -->
+    <section>
+      <h2>AWS for Data Engineering</h2>
+      <ul>
+        <li><strong>Glue:</strong> Serverless ETL with schema evolution support</li>
+        <li><strong>SageMaker:</strong> Build/train/deploy ML models</li>
+        <li><strong>Lake Formation:</strong> Manage secure Hive-to-S3 transitions</li>
+        <li><strong>Redshift + Athena:</strong> Query S3 with SQL</li>
+        <li><strong>EventBridge + Step Functions:</strong> AI-triggered workflows</li>
+      </ul>
+    </section>
+
+    <!-- Slide 4 -->
+    <section>
+      <h2>GCP: Vertex AI & Data Engineering</h2>
+      <ul>
+        <li><strong>BigQuery:</strong> Serverless SQL for large-scale analytics</li>
+        <li><strong>Vertex AI:</strong> LLM and model management + pipelines</li>
+        <li><strong>Cloud Composer:</strong> Airflow for orchestrating AI pipelines</li>
+        <li><strong>Dataflow:</strong> Stream/batch pipelines (Apache Beam)</li>
+        <li>Ideal for ingestion + feature engineering + explainability</li>
+      </ul>
+    </section>
+
+    <!-- Slide 5 -->
+    <section>
+      <h2>Databricks: Unified Analytics & AI</h2>
+      <ul>
+        <li><strong>Delta Lake:</strong> ACID tables on cloud object storage</li>
+        <li><strong>MLflow:</strong> Model tracking, versioning & deployment</li>
+        <li><strong>Unity Catalog:</strong> Centralized data governance</li>
+        <li><strong>AutoML:</strong> Low-code ML experimentation</li>
+        <li>Connects to Hive, Snowflake, AWS/GCP easily</li>
+      </ul>
+    </section>
+
+    <!-- Slide 6 -->
+    <section>
+      <h2>Metadata-Driven AI Engineering</h2>
+      <ul>
+        <li><strong>OpenMetadata / Atlan / Alation:</strong> AI-enriched metadata discovery</li>
+        <li>Column-level lineage + data quality alerts</li>
+        <li>Integrates with Hive, Snowflake, DBT, Kafka</li>
+        <li>Supports LLM plugins for natural language search & doc generation</li>
+        <li>Critical for governed data mesh and AI usage</li>
+      </ul>
+    </section>
+
+    <!-- Slide 7 -->
+    <section>
+      <h2>Interoperability & Orchestration Tools</h2>
+      <ul>
+        <li><strong>Apache Airflow:</strong> Central DAG engine for AI + ETL jobs</li>
+        <li><strong>DBT (Data Build Tool):</strong> Modular transformations + testing</li>
+        <li><strong>Great Expectations:</strong> AI-integrated data validation</li>
+        <li><strong>Kafka:</strong> Streaming + ML-based event scoring</li>
+        <li>Enable composable, observable, scalable data pipelines</li>
+      </ul>
+    </section>
+
+    <!-- Slide 8 -->
+    <section>
+      <h2>Recommendations & Integration Patterns</h2>
+      <ul>
+        <li>Start with key domains: client 360, risk scoring, compliance</li>
+        <li>Use SageMaker or Vertex AI for ML workloads triggered by DAGs</li>
+        <li>Adopt Unity Catalog or OpenMetadata for unified governance</li>
+        <li>Use DBT + Snowpark for transformation + LLM augmentation</li>
+        <li>Set up metadata and observability platform first</li>
+      </ul>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    transition: 'slide',
+    slideNumber: true,
+    controls: true,
+    progress: true
+  });
+</script>
+</body>
+</html>
