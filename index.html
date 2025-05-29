@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ataccama ONE: From Data Catalog to Rule Setup</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; line-height: 1.6; }
+        h1 { text-align: center; color: #2a2f45; }
+        h2 { color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 30px;}
+        .step-section { background-color: #f9f9f9; margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .screenshot-placeholder { 
+            width: 100%; 
+            max-width: 600px; 
+            height: auto; 
+            background-color: #e9ecef; 
+            border: 2px dashed #ced4da; 
+            text-align: center; 
+            padding: 20px; 
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: #495057;
+            border-radius: 5px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            display: block; /* For centering if needed */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        p, li { font-size: 1em; }
+        ul { margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Ataccama ONE: Step-by-Step Guide from Data Catalog to DQ Rule Setup</h1>
+
+    <div class="step-section" id="step1">
+        <h2>Step 1: Understand Data Catalog and its role</h2>
+        <p>A Data Catalog is a centralized inventory of your data assets. It provides metadata—data about your data—which helps you understand, find, and trust your data. In the context of Data Quality (DQ), the Data Catalog is crucial because it provides the necessary information and starting point for defining and applying DQ rules.</p>
+        <p>In Ataccama ONE, you typically start by connecting to your various data sources. This process brings metadata about your tables, columns (attributes), and other data assets into the Catalog. Often, this is followed by data profiling, which analyzes the content and structure of your data, enriching the catalog with statistics, detected patterns, and potential quality issues. This enriched catalog then serves as the foundation for creating targeted DQ rules. For instance, you might browse the catalog, identify an attribute with suspect data (perhaps from profiling insights), and then initiate rule creation directly from that attribute.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot of the main Ataccama ONE Data Catalog interface, showing various cataloged items like tables or schemas. Highlighting the 'Catalog Items' or a similar navigation link would be beneficial. (e.g., an image similar to the general catalog view in Ataccama documentation)</div>
+    </div>
+
+    <div class="step-section" id="step2">
+        <h2>Step 2: Navigate to the Data Catalog in Ataccama ONE</h2>
+        <p>Once you are in the Ataccama ONE environment, you'll typically find the Data Catalog through a main navigation menu. Look for options like 'Data Catalog,' 'Catalog Items,' or 'Browse Catalog.'</p>
+        <p>After accessing the catalog, you can:</p>
+        <ul>
+            <li><strong>Browse:</strong> Navigate through your connected data sources, schemas, and tables. This is useful when you have a general idea of where the data resides.</li>
+            <li><strong>Search:</strong> Use the search functionality (often indicated by a search bar) to find specific catalog items (tables, views, etc.) or attributes by name or other metadata properties.</li>
+        </ul>
+        <p>Once you've located the relevant catalog item (e.g., a specific table like 'CUSTOMERS' or 'PRODUCTS'), you will select it to view its details. Within the details screen for that catalog item, you'll typically find tabs such as 'Overview,' 'Attributes,' 'Profile & DQ insights,' or 'Data Quality.' These tabs allow you to explore the item's metadata, see its attributes (columns), review profiling results, and manage associated DQ rules. To set up a rule for a specific piece of data, you'll first need to identify the attribute within this view.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot depicting the Ataccama ONE interface where a user is browsing a list of Catalog Items (e.g., tables). It could also show a specific Catalog Item's 'Overview' or 'Attributes' tab being selected, listing several attributes. (e.g., an image like 'attribute listing on the catalog item Overview' from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step3">
+        <h2>Step 3: Initiate DQ Rule Creation from Data Catalog (Quick Method)</h2>
+        <p>Once you've identified the specific attribute in the Data Catalog that requires a data quality rule, Ataccama ONE provides a 'Quick DQ rule creation from attribute' workflow. This method is optimized for speed and convenience when you already have a good idea of the rule logic.</p>
+        <p>Here's how to initiate it:</p>
+        <ol>
+            <li><strong>Locate the Attribute:</strong> Navigate to the catalog item (e.g., a table) and find the attribute in its listing. This listing is often found on tabs like 'Overview,' 'Attributes,' or 'Profile & DQ insights.'</li>
+            <li><strong>Access Rule Creation:</strong>
+                <ul>
+                    <li>Typically, you'll find a <strong>three-dots menu (⋮)</strong> or a similar context menu next to the attribute name. Click on this menu.</li>
+                    <li>From the options that appear, select <strong>'Create DQ Rule'</strong> (or a similarly phrased option).</li>
+                </ul>
+            </li>
+        </ol>
+        <p>(Alternative: Some parts of the interface might have an 'Add Rule' button that then allows you to 'Create Rule' if a suitable one doesn't already exist.)</p>
+        <p>This action will open the 'Create DQ Rule' dialog, pre-configured with the selected attribute as the primary input for your new rule.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot showing an attribute listing within a catalog item in Ataccama ONE. An arrow or highlight should point to the three-dots menu next to an attribute, with a tooltip or expanded menu showing the 'Create DQ Rule' option selected. (Corresponds to 'Create DQ rule from attribute' image in Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step4">
+        <h2>Step 4: Define Basic Rule Details (Quick Creation Workflow)</h2>
+        <p>Upon initiating the 'Quick DQ Rule' creation, a dialog window will appear. This dialog is designed to streamline the process, and Ataccama ONE helpfully pre-fills some basic details for your new rule:</p>
+        <ul>
+            <li><strong>Input Attribute:</strong> The attribute you selected in the previous step (e.g., 'EMAIL_ADDRESS') will automatically be set as the primary input for the rule. Its data type (e.g., String, Integer) will also be pre-filled.</li>
+            <li><strong>Rule Dimension:</strong> A default Data Quality Dimension is typically pre-selected. Often, this is 'Validity,' which is a common starting point for many rules (verifying data format, content, etc.). You can usually change this dimension if needed (e.g., to Completeness, Uniqueness, Accuracy).</li>
+        </ul>
+        <p>The dialog will then present you with an area to define the actual logic of your rule. If it's the very first time or a very new draft, this area might be empty, prompting you to 'Add condition.' Otherwise, a basic rule structure might already be visible.</p>
+        <p>At this stage, you confirm that the pre-filled input attribute is correct and that the chosen DQ dimension aligns with the kind of check you want to perform.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot of the 'Create DQ Rule' dialog as it first appears in the Quick Creation workflow. It should highlight the pre-filled input attribute name and its data type, as well as the selected default DQ dimension (e.g., Validity). The area for rule logic might be empty or show a prompt like 'Add condition.' (Corresponds to the initial view of 'Create DQ Rule - Logic Implementation' from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step5">
+        <h2>Step 5: Specify Rule Logic</h2>
+        <p>This is where you define what the rule will actually check. After confirming the basic details, you'll focus on the 'Rule Logic' section of the 'Create DQ Rule' dialog.</p>
+        <ol>
+            <li><strong>Adding Conditions:</strong> You build the rule by adding one or more conditions. Each condition evaluates the input attribute(s) against specific criteria.</li>
+            <li><strong>Methods for Defining Logic:</strong>
+                <ul>
+                    <li><strong>Condition Builder:</strong> This is a user-friendly interface that allows you to construct rule logic by selecting options from dropdown menus and filling in values. You typically:
+                        <ul>
+                            <li>Confirm the input attribute.</li>
+                            <li>Choose an operator or function (e.g., 'is empty,' 'contains,' 'matches mask,' 'is greater than').</li>
+                            <li>Provide any necessary values for the operator (e.g., the specific text to contain, the regular expression for the mask, the number for comparison).</li>
+                            <li>Specify what the outcome should be if the condition is met (e.g., if 'EMAIL_ADDRESS' <em>does not contain</em> '@', then the result is 'Invalid').</li>
+                        </ul>
+                    </li>
+                    <li><strong>Advanced Expression (Optional):</strong> For more complex scenarios or users comfortable with Ataccama's expression language (ONE Expressions), there's often an option to switch to an 'Advanced Expression' mode. This allows you to write custom code to define the rule's logic, offering greater flexibility.</li>
+                </ul>
+            </li>
+        </ol>
+        <p><strong>Simple Example (using Condition Builder):</strong></p>
+        <p>Let's say we are creating a rule for an 'EMAIL_ADDRESS' attribute, and we want to check if it's not empty.</p>
+        <ul>
+            <li><strong>Input Attribute:</strong> EMAIL_ADDRESS (pre-filled)</li>
+            <li><strong>Condition:</strong> You would add a condition like:
+                <ul>
+                    <li><code>Input: EMAIL_ADDRESS</code></li>
+                    <li><code>Operator: Is empty</code></li>
+                    <li><code>Result if true: Invalid</code> (Meaning, if the email address <em>is empty</em>, it's considered invalid according to this rule).</li>
+                </ul>
+            </li>
+            <li>You might also define a corresponding 'Valid' result if the condition <code>Is not empty</code> is true.</li>
+        </ul>
+        <p>You can often chain multiple conditions together using AND/OR logic to build more sophisticated rules.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot of the 'Create DQ Rule' dialog, specifically focusing on the rule logic area. It should show the Condition Builder interface with at least one condition defined (e.g., an input attribute selected, an operator like 'matches_mask' or 'is not empty' chosen, and a value provided). (Corresponds to 'Create DQ Rule - Logic Implementation' showing condition building from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step6">
+        <h2>Step 6: Test the Rule</h2>
+        <p>Before saving and applying a new Data Quality rule, it's crucial to test it to ensure it behaves as expected. Ataccama ONE provides a testing facility directly within the rule creation dialog.</p>
+        <ol>
+            <li><strong>Access Testing Interface:</strong> Look for a 'Test Rule' button or tab. Clicking this will typically open a test panel.</li>
+            <li><strong>Input Test Data:</strong>
+                <ul>
+                    <li>The test interface usually includes a table where your rule's input attribute(s) are shown as columns.</li>
+                    <li>This table might be pre-filled with sample data from the attribute if data samples are available in the catalog and you have permission to view them.</li>
+                    <li>You can manually enter various test values into these columns. It's important to test with data that should pass the rule, data that should fail, edge cases, and different formats if applicable.</li>
+                    <li>You can often add or remove rows in this test table to cover multiple scenarios.</li>
+                </ul>
+            </li>
+            <li><strong>Observe Results:</strong> As you input or modify test data, the rule is evaluated in real-time (or by clicking a 'Run Test' button). The outcome for each test row (e.g., 'Valid,' 'Invalid,' 'Accurate,' 'Not Accurate,' plus any score if defined) is displayed.</li>
+            <li><strong>Iterate if Necessary:</strong> If the test results are not what you expect, you can go back to the rule logic definition, make adjustments, and then re-test until you are confident the rule is correct.</li>
+        </ol>
+        <p>This iterative testing process helps catch errors early and ensures your DQ rules are effective.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A composite image or two separate images. One showing the 'Test Rule' button/interface. The second showing the 'Test table' with sample input values and the corresponding rule evaluation results (e.g., 'Valid'/'Invalid'). (Corresponds to 'Test Rule' and 'Test table' images from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step7">
+        <h2>Step 7: Provide General Information and Publish (Quick Creation)</h2>
+        <p>Once you've defined and tested your rule's logic, you'll proceed to the final step in the quick creation workflow: providing general information and publishing the rule.</p>
+        <ol>
+            <li><strong>Navigate to General Information:</strong> After testing, select 'Next step' (or a similar button) in the 'Create DQ Rule' dialog. This will take you to a screen where you provide metadata for your new rule.</li>
+            <li><strong>Fill in Rule Details:</strong>
+                <ul>
+                    <li><strong>Name:</strong> Give your rule a clear and descriptive name (e.g., 'Email Address Format Check', 'Order Quantity Must Be Positive'). This is mandatory.</li>
+                    <li><strong>Description (Optional but Recommended):</strong> Provide a more detailed explanation of what the rule does, its purpose, and perhaps how to interpret its results.</li>
+                    <li><strong>Stewardship (Recommended):</strong> Assign a user group responsible for this rule.</li>
+                    <li><strong>Share with (Optional):</strong> Specify which user groups or individual users should have access to see or use this rule.</li>
+                </ul>
+            </li>
+            <li><strong>Publish and Apply:</strong>
+                <ul>
+                    <li>After filling in the general information, you'll select an option like <strong>'Publish and apply'</strong>.</li>
+                    <li>The exact wording might vary (e.g., 'Publish', 'Request publish') depending on permissions and review workflows.</li>
+                </ul>
+            </li>
+            <li><strong>Confirmation:</strong> A confirmation message will typically appear.</li>
+            <li><strong>Activate by Publishing Catalog Item:</strong> For the rule to be used in DQ evaluations, the <strong>catalog item</strong> (table/asset) itself usually needs to be published.</li>
+        </ol>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A composite image or two separate images. One for the 'General Information' screen in the 'Create DQ Rule' dialog (showing Name, Description, Stewardship fields). The second showing a 'Success notification' message. (Corresponds to 'Create DQ Rule - General Information' and 'Success notification' from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step8">
+        <h2>Step 8: Alternative - Create DQ Evaluation Rule in the Rule Library</h2>
+        <p>While the 'Quick DQ rule creation from attribute' method is convenient, Ataccama ONE also provides a more comprehensive way to create rules: directly within the <strong>Rule Library</strong>. This method is preferred when:</p>
+        <ul>
+            <li>You need access to more advanced rule creation options (e.g., defining parameters, variables, complex scoring).</li>
+            <li>You want to create a reusable rule not immediately tied to a specific attribute.</li>
+            <li>You are developing a complex rule requiring more detailed configuration.</li>
+        </ul>
+        <p><strong>Navigation and Initial Creation:</strong></p>
+        <ol>
+            <li><strong>Navigate to the Rule Library:</strong> Go to <strong>'Data Quality'</strong> > <strong>'Rules'</strong>.</li>
+            <li><strong>Create New Rule:</strong> Click the <strong>'Create'</strong> button.</li>
+            <li><strong>Provide Initial Information:</strong>
+                <ul>
+                    <li><strong>Name:</strong> Unique name for your rule.</li>
+                    <li><strong>Rule Type (DQ Dimension):</strong> Explicitly select the DQ dimension (e.g., Validity, Uniqueness).</li>
+                    <li><strong>Description, Rule Definition Source, Stewardship.</strong></li>
+                </ul>
+            </li>
+            <li><strong>Save Draft:</strong> Click <strong>'Save'</strong>. The system will then indicate that the rule's logic needs to be defined.</li>
+        </ol>
+        <p>You will then proceed to the 'Implementation' tab for this new rule.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A composite image or two separate images. One showing the 'Rule listing' in the Ataccama ONE Rule Library with the 'Create' button highlighted. The second showing the initial state of a new rule draft, perhaps with 'New rule missing implementation' message. (Corresponds to 'Rule listing' and 'New rule missing implementation' from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step9">
+        <h2>Step 9: Rule Implementation in the Library (Advanced Options)</h2>
+        <p>After creating a draft rule in the Rule Library, you'll define its core logic and advanced characteristics in its 'Implementation' tab.</p>
+        <p><strong>1. Define Inputs, Parameters, and Variables:</strong></p>
+        <ul>
+            <li><strong>Input Attributes:</strong> Explicitly <strong>'Add attribute'</strong>, provide a name and select its data type. You can associate <strong>Terms</strong>.</li>
+            <li><strong>Parameters (Optional):</strong> Make rules reusable (e.g., `Age > [MinimumAgeParam]`). Select <strong>'Add parameter,'</strong> provide a name, and data type. Values are provided when applying the rule.</li>
+            <li><strong>Variables (Optional):</strong> Perform transformations on inputs before logic is applied (e.g., convert to uppercase). Select <strong>'Add variable,'</strong> name it, choose the base input attribute, and apply transformations.</li>
+        </ul>
+        <p><strong>2. Define Rule Logic:</strong></p>
+        <ul>
+            <li><strong>Rule Type Context:</strong> You've already selected the DQ Dimension.</li>
+            <li><strong>Standard, Aggregation, or Component Rule:</strong> Specify the rule's nature.</li>
+            <li><strong>Condition Builder vs. Advanced Expression:</strong> Use the interactive builder or write custom logic with ONE Expressions.</li>
+            <li><strong>Define Outcomes:</strong> For each condition, define the result (e.g., 'Valid', 'Invalid') and optionally an explanation.</li>
+        </ul>
+        <p><strong>3. Assigning Scores (Optional):</strong></p>
+        <ul>
+            <li>Assign a numerical <strong>score</strong> to different outcomes, representing severity. Useful in Monitoring Projects.</li>
+        </ul>
+        <p>Once implemented, the rule is ready for testing and publishing.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A composite of multiple screenshots if possible, or representative ones for: 1. 'Add rule inputs' interface. 2. Creating a 'Variable' or 'Parameter'. 3. The 'Condition builder' in the library context. 4. The interface for 'Assigning scores'. (Corresponds to 'Add rule inputs', 'Advanced expression in variables', 'Condition builder', 'Assigning scores' images from Ataccama docs).</div>
+    </div>
+
+    <div class="step-section" id="step10">
+        <h2>Step 10: Publish Rule from Library</h2>
+        <p>Once you have fully defined your Data Quality rule in the Rule Library and tested it, the next step is to make it official by publishing it.</p>
+        <ol>
+            <li><strong>Locate the Publish Action:</strong> Within the rule's interface in the Rule Library, find a <strong>'Publish'</strong> button or action.</li>
+            <li><strong>Review and Confirm:</strong> The exact action might depend on permissions and workflows ('Publish', 'Request Publish', or 'Submit for Review').</li>
+            <li><strong>Impact of Publishing:</strong> Finalizes the rule's definition, makes it available for others to discover and apply, and usable in Monitoring Projects.</li>
+        </ol>
+        <p>After publishing, the rule is a standalone, reusable asset.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot of a completed DQ Rule definition within the Ataccama ONE Rule Library. The 'Publish' (or 'Request Publish') button should be clearly visible and perhaps highlighted.</div>
+    </div>
+
+    <div class="step-section" id="step11">
+        <h2>Step 11: Apply the Rule</h2>
+        <p>Whether you created your rule via the 'Quick Creation' method (where it's often automatically applied to the source attribute) or created it in the Rule Library, you need to ensure it's correctly associated with the data it's meant to evaluate.</p>
+        <p><strong>Applying Rules from the Library (or to other attributes):</strong></p>
+        <ol>
+            <li><strong>Navigate to the Catalog Item:</strong> Go to the Data Catalog and find the specific catalog item (table, view) and then the attribute(s) to which you want to apply a rule.</li>
+            <li><strong>Add Rule to Attribute:</strong>
+                <ul>
+                    <li>On the attribute's detail screen or context menu, look for an option like **'Add Rule'** or **'Manage Rules'**.</li>
+                    <li>This will typically open an 'Add Rule' dialog.</li>
+                    <li>Here, you can search or browse the Rule Library for the published rule you want to apply. Select your rule.</li>
+                </ul>
+            </li>
+            <li><strong>Configure Parameters (if any):</strong> If the rule uses parameters (e.g., `[MinimumAgeParam]`), you will be prompted to provide values for these parameters in the context of this specific attribute. For example, for one attribute, `MinimumAgeParam` might be 18, and for another, it might be 21.</li>
+            <li><strong>Add Rule to Term (Alternative):</strong> You can also associate DQ rules with Business Terms in your Glossary. When a term is then linked to attributes in the catalog, these associated rules can be automatically suggested or applied, promoting consistency.</li>
+        </ol>
+        <p><strong>Publish Catalog Item Changes:</strong></p>
+        <p>Crucially, after applying a new rule (or changing rule associations) to a catalog item, you usually need to **publish the catalog item itself**. This action finalizes the changes to the catalog item's metadata, including its DQ rule configuration, making the rules active for subsequent DQ evaluations and monitoring.</p>
+        <div class="screenshot-placeholder"><b>Image Placeholder:</b> A screenshot of the 'Add Rule' dialog in Ataccama ONE, showing a user searching for or selecting a rule from the library to apply to an attribute. If the rule has parameters, the parameter configuration step could also be shown. (Corresponds to 'Add Rule dialog' from Ataccama docs).</div>
+    </div>
+
+</body>
+</html>
